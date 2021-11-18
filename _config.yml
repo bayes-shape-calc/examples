@@ -6,15 +6,17 @@
 # https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
 # https://learnxinyminutes.com/docs/yaml/
 
-title: fastpages
+title: "Bayesian shape calculation"
 description: An easy to use blogging platform with support for Jupyter Notebooks.
 github_username: bayes-shape-calc-dev
 # you can comment the below line out if your repo name is not different than your baseurl
+
 github_repo: "bayes-shape-calc"
 
 # OPTIONAL: override baseurl and url if using a custom domain
 # Note: leave out the trailing / from this value. 
 url: "https://bayes-shape-calc-dev.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+
 
 ###########################################################
 #########  Special Instructions for baseurl ###############
@@ -34,16 +36,18 @@ url: "https://bayes-shape-calc-dev.github.io" # the base hostname & protocol for
 #
 # 3. You must replace the parameter `baseurl` in _action_files/settings.ini with the same value as you set here but WITHOUT QUOTES.
 #
+
 baseurl: "/bayes-shape-calc" # the subpath of your site, e.g. "/blog".
 
+
 # Github and twitter are optional:
-minima:
-  social_links:
-    twitter: fastdotai
-    github: fastai
+#minima:
+  #social_links:
+    #twitter: fastdotai
+    github: bayes-shape-calc-dev
 
 # Set this to true to get LaTeX math equation support
-use_math: 
+use_math: true
 
 # Set this to true to display the summary of your blog post under your title on the Home page.
 show_description: true
@@ -72,8 +76,8 @@ include:
 # This specifies what badges are turned on by default for notebook posts.
 default_badges:
   github: true
-  binder: true
-  colab: true
+  #binder: true
+  #colab: true
 
 # Escape HTML in post descriptions
 html_escape:
