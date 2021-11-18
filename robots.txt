@@ -1,0 +1,1 @@
+Sitemap: https://bayes-shape-calc-dev.github.io/bayes-shape-calc/sitemap.xml
