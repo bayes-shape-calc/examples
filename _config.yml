@@ -44,7 +44,7 @@ baseurl: "/bayes-shape-calc" # the subpath of your site, e.g. "/blog".
 #minima:
   #social_links:
     #twitter: fastdotai
-    github: bayes-shape-calc-dev
+    #github: bayes-shape-calc-dev
 
 # Set this to true to get LaTeX math equation support
 use_math: true
