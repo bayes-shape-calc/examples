@@ -72,6 +72,7 @@ exclude:
 # this setting allows you to keep pages organized in the _pages folder
 include:
   - _pages
+  - _notebook
 
 # This specifies what badges are turned on by default for notebook posts.
 default_badges:
