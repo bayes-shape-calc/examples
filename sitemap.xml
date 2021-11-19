@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://bayes-shape-calc-dev.github.io/bayes-shape-calc/deconvolution/calibration/mcmc/2021/11/18/signal-processing.html</loc>
+<loc>https://bayes-shape-calc-dev.github.io/deconvolution/calibration/mcmc/2021/11/18/signal-processing.html</loc>
 <lastmod>2021-11-18T00:00:00-06:00</lastmod>
 </url>
 <url>
-<loc>https://bayes-shape-calc-dev.github.io/bayes-shape-calc/deconvolution/calibration/mcmc/2021/12/18/signal-processing.html</loc>
-<lastmod>2021-12-18T00:00:00-06:00</lastmod>
+<loc>https://bayes-shape-calc-dev.github.io/about/</loc>
 </url>
 <url>
-<loc>https://bayes-shape-calc-dev.github.io/bayes-shape-calc/about/</loc>
+<loc>https://bayes-shape-calc-dev.github.io/</loc>
 </url>
 <url>
-<loc>https://bayes-shape-calc-dev.github.io/bayes-shape-calc/</loc>
+<loc>https://bayes-shape-calc-dev.github.io/search/</loc>
 </url>
 <url>
-<loc>https://bayes-shape-calc-dev.github.io/bayes-shape-calc/search/</loc>
-</url>
-<url>
-<loc>https://bayes-shape-calc-dev.github.io/bayes-shape-calc/categories/</loc>
+<loc>https://bayes-shape-calc-dev.github.io/categories/</loc>
 </url>
 </urlset>
