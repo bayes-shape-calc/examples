@@ -11,7 +11,7 @@ description: "Using Bayesian inference to calculate the shape of data."
 github_username: bayes-shape-calc
 # you can comment the below line out if your repo name is not different than your baseurl
 
-github_repo: "bayes-shape-calc.github.io"
+github_repo: "examples"
 
 # OPTIONAL: override baseurl and url if using a custom domain
 # Note: leave out the trailing / from this value. 
@@ -37,7 +37,7 @@ url: "https://bayes-shape-calc.github.io" # the base hostname & protocol for you
 # 3. You must replace the parameter `baseurl` in _action_files/settings.ini with the same value as you set here but WITHOUT QUOTES.
 #
 
-baseurl: "" # the subpath of your site, e.g. "/blog".
+baseurl: "/examples" # the subpath of your site, e.g. "/blog".
 
 
 # Github and twitter are optional:
