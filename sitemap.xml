@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://bayes-shape-calc.github.io/examples/deconvolution/calibration/mcmc/2021/11/18/signal-processing.html</loc>
-<lastmod>2021-11-18T00:00:00-06:00</lastmod>
+<loc>https://bayes-shape-calc.github.io/examples/template-search/2021/11/20/peak-search.html</loc>
+<lastmod>2021-11-20T00:00:00-06:00</lastmod>
+</url>
+<url>
+<loc>https://bayes-shape-calc.github.io/examples/deconvolution/calibration/mcmc/2021/11/20/signal-processing.html</loc>
+<lastmod>2021-11-20T00:00:00-06:00</lastmod>
 </url>
 <url>
 <loc>https://bayes-shape-calc.github.io/examples/about/</loc>
