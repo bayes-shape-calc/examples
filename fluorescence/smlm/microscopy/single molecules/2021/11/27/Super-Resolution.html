@@ -4,20 +4,20 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>Super Re | Bayesian Shape Calculation: Examples Gallery</title>
+<title>Super Resolution Microscopy | Bayesian Shape Calculation: Examples Gallery</title>
 <meta name="generator" content="Jekyll v4.1.1" />
-<meta property="og:title" content="Super Re" />
+<meta property="og:title" content="Super Resolution Microscopy" />
 <meta name="author" content="Korak Ray, Anjali Verma, Ruben Gonzalez and Colin Kinz-Thompson" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="This notebook is an example of how to automatically process your data using shapes" />
-<meta property="og:description" content="This notebook is an example of how to automatically process your data using shapes" />
-<link rel="canonical" href="https://bayes-shape-calc.github.io/examples/filter/microscopy/fourier/transform/2021/11/27/Super-Resolution.html" />
-<meta property="og:url" content="https://bayes-shape-calc.github.io/examples/filter/microscopy/fourier/transform/2021/11/27/Super-Resolution.html" />
+<meta name="description" content="This notebook is an example of how super resolve spots in fluorescsence microscopy data (a la SMLM)" />
+<meta property="og:description" content="This notebook is an example of how super resolve spots in fluorescsence microscopy data (a la SMLM)" />
+<link rel="canonical" href="https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/11/27/Super-Resolution.html" />
+<meta property="og:url" content="https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/11/27/Super-Resolution.html" />
 <meta property="og:site_name" content="Bayesian Shape Calculation: Examples Gallery" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-11-27T00:00:00-06:00" />
 <script type="application/ld+json">
-{"description":"This notebook is an example of how to automatically process your data using shapes","url":"https://bayes-shape-calc.github.io/examples/filter/microscopy/fourier/transform/2021/11/27/Super-Resolution.html","@type":"BlogPosting","headline":"Super Re","dateModified":"2021-11-27T00:00:00-06:00","datePublished":"2021-11-27T00:00:00-06:00","author":{"@type":"Person","name":"Korak Ray, Anjali Verma, Ruben Gonzalez and Colin Kinz-Thompson"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://bayes-shape-calc.github.io/examples/filter/microscopy/fourier/transform/2021/11/27/Super-Resolution.html"},"@context":"https://schema.org"}</script>
+{"description":"This notebook is an example of how super resolve spots in fluorescsence microscopy data (a la SMLM)","url":"https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/11/27/Super-Resolution.html","@type":"BlogPosting","headline":"Super Resolution Microscopy","dateModified":"2021-11-27T00:00:00-06:00","datePublished":"2021-11-27T00:00:00-06:00","author":{"@type":"Person","name":"Korak Ray, Anjali Verma, Ruben Gonzalez and Colin Kinz-Thompson"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/11/27/Super-Resolution.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/examples/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://bayes-shape-calc.github.io/examples/feed.xml" title="Bayesian Shape Calculation: Examples Gallery" /><link rel="shortcut icon" type="image/x-icon" href="/examples/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -88,7 +88,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Super Re</h1><p class="page-description">This notebook is an example of how to automatically process your data using shapes</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-11-27T00:00:00-06:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">Super Resolution Microscopy</h1><p class="page-description">This notebook is an example of how super resolve spots in fluorescsence microscopy data (a la SMLM)</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-11-27T00:00:00-06:00" itemprop="datePublished">
         Nov 27, 2021
       </time>• 
           <span itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -103,16 +103,16 @@ window.onload = wrap_img;
     
       <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
       
-        <a class="category-tags-link" href="/examples/categories/#filter">filter</a>
+        <a class="category-tags-link" href="/examples/categories/#fluorescence">fluorescence</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/examples/categories/#SMLM">SMLM</a>
         &nbsp;
       
         <a class="category-tags-link" href="/examples/categories/#microscopy">microscopy</a>
         &nbsp;
       
-        <a class="category-tags-link" href="/examples/categories/#Fourier">Fourier</a>
-        &nbsp;
-      
-        <a class="category-tags-link" href="/examples/categories/#transform">transform</a>
+        <a class="category-tags-link" href="/examples/categories/#single molecules">single molecules</a>
         
       
       </p>
@@ -558,7 +558,7 @@ Found 0.492 0.390
 
 
 
-  </div><a class="u-url" href="/examples/filter/microscopy/fourier/transform/2021/11/27/Super-Resolution.html" hidden></a>
+  </div><a class="u-url" href="/examples/fluorescence/smlm/microscopy/single%20molecules/2021/11/27/Super-Resolution.html" hidden></a>
 </article>
 
       </div>
