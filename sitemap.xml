@@ -5,10 +5,6 @@
 <lastmod>2021-11-20T00:00:00-06:00</lastmod>
 </url>
 <url>
-<loc>https://bayes-shape-calc.github.io/examples/deconvolution/calibration/mcmc/2021/11/20/signal-processing.html</loc>
-<lastmod>2021-11-20T00:00:00-06:00</lastmod>
-</url>
-<url>
 <loc>https://bayes-shape-calc.github.io/examples/filter/microscopy/fourier/transform/2021/11/21/Microscopy-Automatic-Aperture-Filtering.html</loc>
 <lastmod>2021-11-21T00:00:00-06:00</lastmod>
 </url>
@@ -19,6 +15,10 @@
 <url>
 <loc>https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/11/27/Super-Resolution.html</loc>
 <lastmod>2021-11-27T00:00:00-06:00</lastmod>
+</url>
+<url>
+<loc>https://bayes-shape-calc.github.io/examples/deconvolution/calibration/mcmc/2021/11/30/Signal-Processing.html</loc>
+<lastmod>2021-11-30T00:00:00-06:00</lastmod>
 </url>
 <url>
 <loc>https://bayes-shape-calc.github.io/examples/about/</loc>
