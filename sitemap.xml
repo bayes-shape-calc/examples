@@ -1,16 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://bayes-shape-calc.github.io/examples/filter/microscopy/fourier/transform/2021/11/21/Microscopy-Automatic-Aperture-Filtering.html</loc>
-<lastmod>2021-11-21T00:00:00-06:00</lastmod>
-</url>
-<url>
 <loc>https://bayes-shape-calc.github.io/examples/steps/jumps/2021/11/21/Step-Detection.html</loc>
 <lastmod>2021-11-21T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/11/27/Super-Resolution.html</loc>
-<lastmod>2021-11-27T00:00:00-06:00</lastmod>
 </url>
 <url>
 <loc>https://bayes-shape-calc.github.io/examples/template-search/2021/12/01/Peak-Search.html</loc>
@@ -19,6 +11,14 @@
 <url>
 <loc>https://bayes-shape-calc.github.io/examples/deconvolution/calibration/mcmc/2021/12/01/Signal-Processing.html</loc>
 <lastmod>2021-12-01T00:00:00-06:00</lastmod>
+</url>
+<url>
+<loc>https://bayes-shape-calc.github.io/examples/filter/microscopy/fourier-transform/2021/12/08/Microscopy-Automatic-Aperture-Filtering.html</loc>
+<lastmod>2021-12-08T00:00:00-06:00</lastmod>
+</url>
+<url>
+<loc>https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/12/08/Super-Resolution.html</loc>
+<lastmod>2021-12-08T00:00:00-06:00</lastmod>
 </url>
 <url>
 <loc>https://bayes-shape-calc.github.io/examples/about/</loc>
