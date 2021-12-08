@@ -306,7 +306,7 @@ Centroid (main) 0.469 0.373
 <h1 id="Initial-localization">
 <a class="anchor" href="#Initial-localization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Initial localization<a class="anchor-link" href="#Initial-localization"> </a>
 </h1>
-<p>We noq grid the image into coarsely spread out points where a molecule might be centered. We'll generate a template with some chosen guess width, and use the wrong noise model, and calculate the evidence for each template. We will zoom in on whichever grid point gives us the best evidence for the next step.</p>
+<p>We now grid the image into coarsely spread out points where a molecule might be centered. We'll generate a template with some chosen guess width, and using the wrong noise model, calculate the evidence for each template. We will zoom in on whichever grid point gives us the best evidence for the next step.</p>
 
 </div>
 </div>
@@ -408,7 +408,7 @@ Found 0.421 0.421
 <h1 id="Zoom-in">
 <a class="anchor" href="#Zoom-in" aria-hidden="true"><span class="octicon octicon-link"></span></a>Zoom in<a class="anchor-link" href="#Zoom-in"> </a>
 </h1>
-<p>Now let's zoom into the pixel we found the molecule located in. As above, we will  sub-divide this region into a grid, create templates (PSF) centered at each grid point, calculate the evidence, and then compare to find the best fit</p>
+<p>Now let's zoom into the pixel we found the molecule located in. We will use the same process performed above: sub-divide this region into a grid, create templates (PSF) centered at each grid point, calculate the evidence, and then compare to find the best fit.</p>
 
 </div>
 </div>
