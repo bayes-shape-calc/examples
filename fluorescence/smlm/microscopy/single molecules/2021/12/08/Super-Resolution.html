@@ -4,9 +4,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>Super-resolution Microscopy | Bayesian Shape Calculation: Examples Gallery</title>
+<title>Super-resolution Microscopy using BITS | Bayesian Shape Calculation: Examples Gallery</title>
 <meta name="generator" content="Jekyll v4.1.1" />
-<meta property="og:title" content="Super-resolution Microscopy" />
+<meta property="og:title" content="Super-resolution Microscopy using BITS" />
 <meta name="author" content="Korak Ray, Anjali Verma, Ruben Gonzalez and Colin Kinz-Thompson" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="This notebook is an example of how to super resolve spots in fluorescence microscopy data (a la Single-Molecule Localization Microscopy)." />
@@ -17,7 +17,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2021-12-08T00:00:00-06:00" />
 <script type="application/ld+json">
-{"description":"This notebook is an example of how to super resolve spots in fluorescence microscopy data (a la Single-Molecule Localization Microscopy).","url":"https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/12/08/Super-Resolution.html","@type":"BlogPosting","headline":"Super-resolution Microscopy","dateModified":"2021-12-08T00:00:00-06:00","datePublished":"2021-12-08T00:00:00-06:00","author":{"@type":"Person","name":"Korak Ray, Anjali Verma, Ruben Gonzalez and Colin Kinz-Thompson"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/12/08/Super-Resolution.html"},"@context":"https://schema.org"}</script>
+{"description":"This notebook is an example of how to super resolve spots in fluorescence microscopy data (a la Single-Molecule Localization Microscopy).","url":"https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/12/08/Super-Resolution.html","@type":"BlogPosting","headline":"Super-resolution Microscopy using BITS","dateModified":"2021-12-08T00:00:00-06:00","datePublished":"2021-12-08T00:00:00-06:00","author":{"@type":"Person","name":"Korak Ray, Anjali Verma, Ruben Gonzalez and Colin Kinz-Thompson"},"mainEntityOfPage":{"@type":"WebPage","@id":"https://bayes-shape-calc.github.io/examples/fluorescence/smlm/microscopy/single%20molecules/2021/12/08/Super-Resolution.html"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/examples/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://bayes-shape-calc.github.io/examples/feed.xml" title="Bayesian Shape Calculation: Examples Gallery" /><link rel="shortcut icon" type="image/x-icon" href="/examples/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -88,7 +88,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Super-resolution Microscopy</h1><p class="page-description">This notebook is an example of how to super resolve spots in fluorescence microscopy data (a la Single-Molecule Localization Microscopy).</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-12-08T00:00:00-06:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">Super-resolution Microscopy using BITS</h1><p class="page-description">This notebook is an example of how to super resolve spots in fluorescence microscopy data (a la Single-Molecule Localization Microscopy).</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-12-08T00:00:00-06:00" itemprop="datePublished">
         Dec 8, 2021
       </time>• 
           <span itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -136,7 +136,7 @@ window.onload = wrap_img;
   <div class="post-content e-content" itemprop="articleBody">
     <ul class="section-nav">
 <li class="toc-entry toc-h1"><a href="#Initial-localization">Initial localization </a></li>
-<li class="toc-entry toc-h1"><a href="#Zoom-in">Zoom in </a></li>
+<li class="toc-entry toc-h1"><a href="#Zooming-in">Zooming in </a></li>
 <li class="toc-entry toc-h1"><a href="#Final-Localization">Final Localization </a></li>
 </ul><!--
 #################################################
@@ -150,7 +150,8 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><a href="https://en.wikipedia.org/wiki/Super-resolution_microscopy">Super resolution microscopy</a> is an imaging technique where the diffraction limit is circumvented by localizing the center of diffraction-limited fluorophore "spots". We localize these spots in an image by finding the pixels (and later, the locations inside a pixel) where the templates for these spots have maximum evidence of matching the local shape of the data.</p>
+<p><a href="https://en.wikipedia.org/wiki/Super-resolution_microscopy">Super resolution microscopy</a> is an imaging technique where the diffraction limit is circumvented by localizing the center of diffraction-limited fluorophore "spots".</p>
+<p>Here, we localize these spots in an image by finding the pixels (and later, the locations inside a pixel) where the templates for these spots have maximum evidence of matching the local shape of the data.</p>
 
 </div>
 </div>
@@ -211,7 +212,7 @@ window.onload = wrap_img;
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>First, let us simulate a fluorescence image of a single molecule. To replicate a real-world setting, we add Poisson noise to our image.</p>
+<p>First, let us simulate a fluorescence image of a single molecule. To replicate a realistic dataset, we add Poisson noise to our image.</p>
 
 </div>
 </div>
@@ -314,7 +315,7 @@ Centroid (main) 0.469 0.373
 <h1 id="Initial-localization">
 <a class="anchor" href="#Initial-localization" aria-hidden="true"><span class="octicon octicon-link"></span></a>Initial localization<a class="anchor-link" href="#Initial-localization"> </a>
 </h1>
-<p>We now grid the image into coarsely spread out points where a molecule might be centered. We'll generate a template with some chosen guess width, and using the wrong noise model (i.e. Gaussian noise instead of Poisson noise), calculate the evidence for each template. We will zoom in on whichever grid point gives us the best evidence for the next step.</p>
+<p>First, we grid the image into coarsely spread out points where a molecule might be centered. We'll generate a template with some chosen guess width, and using the wrong noise model (i.e. Gaussian noise instead of Poisson noise), calculate the evidence for each template. We will zoom in on whichever grid point gives us the best evidence for the next step.</p>
 
 </div>
 </div>
@@ -405,7 +406,7 @@ Found 0.421 0.421
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We can see that our method has identified multiple local maxima. As an aside, this grid scanning and local shape calculation is exactly how BITS works. Note that we are only picking the central peak in this example.</p>
+<p>We can see that our method has identified multiple local maxima. As an aside, this grid scanning and local shape calculation is exactly how our method of Bayesian Inference-based Template Search (BITS) works (you can find another example for this <a href="https://bayes-shape-calc.github.io/examples/template-search/2021/12/01/Peak-Search.html">here</a>. Note that we are only picking the central peak in this example.</p>
 
 </div>
 </div>
@@ -413,8 +414,8 @@ Found 0.421 0.421
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Zoom-in">
-<a class="anchor" href="#Zoom-in" aria-hidden="true"><span class="octicon octicon-link"></span></a>Zoom in<a class="anchor-link" href="#Zoom-in"> </a>
+<h1 id="Zooming-in">
+<a class="anchor" href="#Zooming-in" aria-hidden="true"><span class="octicon octicon-link"></span></a>Zooming in<a class="anchor-link" href="#Zooming-in"> </a>
 </h1>
 <p>Now let's zoom into the pixel we found the molecule located in. We will use the same process performed above: sub-divide this region into a grid, create templates (PSF) centered at each grid point, calculate the evidence, and then compare to find the best fit.</p>
 
