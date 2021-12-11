@@ -61,8 +61,8 @@
 
   
       ,"page1": {
-          "title": "About Me",
-          "content": "This website is powered by fastpages 1. . a blogging platform that natively supports Jupyter notebooks in addition to other formats. &#8617; . |",
+          "title": "About Us",
+          "content": "This examples toy gallery is maintained by the Kinz-Thompson and Gonzalez labs. The Bayesian shape calculation code presented here is licensed under GNU General Public License v3.0, . This website is powered by fastpages 1. . a blogging platform that natively supports Jupyter notebooks in addition to other formats. &#8617; . |",
           "url": "https://bayes-shape-calc.github.io/examples/about/",
           "relUrl": "/about/",
           "date": ""
