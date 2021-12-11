@@ -1,8 +1,12 @@
 ---
 layout: page
-title: About Me
+title: About Us
 permalink: /about/
 ---
+
+This examples toy gallery is maintained by the [Kinz-Thompson](https://ckinzthompson.github.io/) and [Gonzalez](http://www.columbia.edu/cu/chemistry/groups/gonzalez/) labs. 
+The Bayesian shape calculation code presented here is licensed under GNU General Public License v3.0,
+
 
 This website is powered by **[fastpages](https://github.com/fastai/fastpages)** [^1].
 
