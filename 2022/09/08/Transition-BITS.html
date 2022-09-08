@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Transition Detection Using BITS | Bayesian Shape Calculation: Examples Gallery</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Transition Detection Using BITS" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Using Bayesian inference to calculate the shape of data." />
+<meta property="og:description" content="Using Bayesian inference to calculate the shape of data." />
+<link rel="canonical" href="https://bayes-shape-calc.github.io/examples/2022/09/08/Transition-BITS.html" />
+<meta property="og:url" content="https://bayes-shape-calc.github.io/examples/2022/09/08/Transition-BITS.html" />
+<meta property="og:site_name" content="Bayesian Shape Calculation: Examples Gallery" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-09-08T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"Using Bayesian inference to calculate the shape of data.","url":"https://bayes-shape-calc.github.io/examples/2022/09/08/Transition-BITS.html","@type":"BlogPosting","headline":"Transition Detection Using BITS","dateModified":"2022-09-08T00:00:00-05:00","datePublished":"2022-09-08T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://bayes-shape-calc.github.io/examples/2022/09/08/Transition-BITS.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/examples/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://bayes-shape-calc.github.io/examples/feed.xml" title="Bayesian Shape Calculation: Examples Gallery" /><link rel="shortcut icon" type="image/x-icon" href="/examples/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/examples/">Bayesian Shape Calculation: Examples Gallery</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/examples/about/">About Us</a><a class="page-link" href="/examples/search/">Search</a><a class="page-link" href="/examples/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Transition Detection Using BITS</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-09-08T00:00:00-05:00" itemprop="datePublished">
+        Sep 8, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      9 min read
+    
+</span></p>
+
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-justify-center">
+          <div class="px-2">
+
+    <a href="https://github.com/bayes-shape-calc/examples/tree/master/_notebooks/2022-09-08-Transition-BITS.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/examples/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          
+          
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2022-09-08-Transition-BITS.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">import</span> <span class="nn">scipy.special</span>
+<span class="kn">import</span> <span class="nn">statistics</span> <span class="k">as</span> <span class="nn">st</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">lgamma</span>
+<span class="kn">import</span> <span class="nn">numba</span> <span class="k">as</span> <span class="nn">nb</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We have previously discussed using shapes for step/jump/transition detection: <a href="https://bayes-shape-calc.github.io/examples/steps/jumps/2021/11/21/Step-Detection.html">Step detection</a></p>
+<p>This notebook, however, will serve as an addendum to that discussion, with more insight into Bayesian Inference-based Template Search (BITS) vs. general shape processing.  We will be trying to find 2 transitions in datasets of variable length and will use both BITS and general shape comparison.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's start by generating some fake data.  We will use the same setup as the previous notebook, and provide a sample dataset below.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@nb</span><span class="o">.</span><span class="n">njit</span>
+<span class="k">def</span> <span class="nf">data_generator</span><span class="p">(</span><span class="n">num_points</span><span class="p">,</span> <span class="n">num_jumps</span><span class="p">,</span> <span class="n">jump_size</span><span class="p">,</span> <span class="n">noise_size</span><span class="p">,</span> <span class="n">drift_size</span><span class="p">,</span> <span class="n">blur</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+    
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">444</span> <span class="o">+</span> <span class="n">seed</span><span class="p">)</span>
+
+    <span class="c1"># parameters of fake data</span>
+    <span class="n">nt</span> <span class="o">=</span> <span class="n">num_points</span>
+    <span class="n">nj</span> <span class="o">=</span> <span class="n">num_jumps</span>
+    
+    <span class="c1"># generating noise &amp; drift</span>
+    <span class="n">tjumps</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">tjumps</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">nj</span><span class="p">:</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">nt</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="o">&lt;</span> <span class="n">nt</span><span class="o">-</span><span class="mi">50</span> <span class="ow">and</span> <span class="n">time</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tjumps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tjumps</span><span class="p">)</span> <span class="o">-</span> <span class="n">time</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">jump_size</span> <span class="o">+</span> <span class="n">blur</span><span class="p">:</span>
+                    <span class="n">tjumps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tjumps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">tjumps</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    
+    <span class="n">zsteps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nj</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nj</span><span class="p">):</span>
+        <span class="n">zsteps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">jump_size</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
+    <span class="n">drift_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nt</span><span class="p">):</span>
+        <span class="n">noise</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">()</span><span class="o">*</span><span class="n">noise_size</span>
+        <span class="n">drift_arr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">()</span><span class="o">*</span><span class="n">drift_size</span>
+    <span class="n">drift</span> <span class="o">=</span> <span class="n">drift_arr</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    
+    <span class="c1"># generating &quot;true&quot; path</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nt</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nj</span><span class="p">):</span>
+        <span class="n">z</span><span class="p">[</span><span class="n">tjumps</span><span class="p">[</span><span class="n">i</span><span class="p">]:]</span> <span class="o">+=</span> <span class="n">zsteps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        
+    <span class="n">data</span> <span class="o">=</span> <span class="n">z</span> <span class="o">+</span> <span class="n">drift</span> <span class="o">+</span> <span class="n">noise</span>
+    
+    <span class="c1"># calculating snr</span>
+    <span class="n">snr</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">zsteps</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">snr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zsteps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">((</span><span class="n">noise</span><span class="o">+</span><span class="n">drift</span><span class="p">)[:</span><span class="n">tjumps</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]]))</span>
+        <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">zsteps</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="n">snr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zsteps</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">((</span><span class="n">noise</span><span class="o">+</span><span class="n">drift</span><span class="p">)[</span><span class="n">tjumps</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]:]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">snr</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">zsteps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">((</span><span class="n">noise</span><span class="o">+</span><span class="n">drift</span><span class="p">)[</span><span class="n">tjumps</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">tjumps</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]])))</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    #print(&#39;SNR = &#39; + str(st.mean(snr)))</span>
+<span class="sd">    #plotting</span>
+<span class="sd">    fig,ax = plt.subplots(1,1,figsize=(12,4))</span>
+<span class="sd">    ax.plot(data,&#39;k&#39;,lw=.5);</span>
+<span class="sd">    #ax[1].plot(data,&#39;o&#39;,color=&#39;k&#39;,markersize=1)</span>
+<span class="sd">    #ax[1].plot(z+drift,lw=2,color=&#39;r&#39;)</span>
+<span class="sd">    #for aa in ax:</span>
+<span class="sd">    #    for i in range(nj):</span>
+<span class="sd">    #        aa.axvline(x=tjumps[i],color=&#39;r&#39;,lw=1,zorder=-1,alpha=.5)</span>
+<span class="sd">    for i in range(nj):</span>
+<span class="sd">        ax.axvline(x=tjumps[i],color=&#39;r&#39;,lw=1,zorder=-1,alpha=.5)</span>
+<span class="sd">    ax.set_title(&#39;Actual Transitions&#39;)</span>
+<span class="sd">    #ax[1].set_title(&#39;Simulated Path&#39;)</span>
+<span class="sd">    plt.show()</span>
+<span class="sd">    &#39;&#39;&#39;</span>  
+    <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">tjumps</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">snr</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="p">,</span> <span class="n">tjumps</span><span class="p">,</span> <span class="n">snr</span> <span class="o">=</span> <span class="n">data_generator</span><span class="p">(</span><span class="n">num_points</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">num_jumps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">jump_size</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">noise_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                                          <span class="n">drift_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">blur</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">45</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;SNR = </span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">snr</span>)
+
+<span class="c1">#plotting</span>
+<span class="n">fig</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="s1">&#39;k&#39;</span><span class="p">,</span><span class="n">lw</span><span class="o">=.</span><span class="mi">5</span><span class="p">);</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tjumps</span><span class="p">)):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">tjumps</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span><span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">zorder</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span><span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+<span class="c1">#ax.set_title(&#39;Actual Transitions&#39;)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;/home/anjali/Documents/BITS_figures/Representative_trace_2.pdf&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>SNR = 3.559
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+" />
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We now create an evidence function corresponding to equation 2.2.1 in the SI of the Bayesian shape calculation paper. This function takes in data, a template, and a variable prior for m (scaling nuisance parameter) and returns the evidence that the input data has the same shape as the template.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@nb</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">[:],</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">[:]),</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">evidence_template</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">prior_m</span><span class="p">,</span> <span class="n">template</span><span class="p">):</span> <span class="c1"># corresponds to Eq. 2.2.1 in SI for shape calculations</span>
+    
+    <span class="c1"># constant evidence statistics</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mf">2.</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span>
+
+    <span class="n">ey</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">eyy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="o">*</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">vy</span> <span class="o">=</span> <span class="n">eyy</span> <span class="o">-</span> <span class="n">ey</span><span class="o">*</span><span class="n">ey</span> <span class="o">+</span> <span class="mf">1e-300</span> <span class="c1">## helps with over/underflow</span>
+    
+    <span class="c1"># priors for m (scale), b (offset), tau (noise)   </span>
+    <span class="n">log_l</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">log_del_m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">prior_m</span><span class="p">)</span> 
+    <span class="n">log_del_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1e5</span><span class="p">)</span>
+    <span class="n">log_del_tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1e5</span><span class="p">)</span>
+    <span class="n">log_l</span> <span class="o">-=</span> <span class="p">(</span><span class="n">log_del_m</span> <span class="o">+</span> <span class="n">log_del_b</span> <span class="o">+</span> <span class="n">log_del_tau</span><span class="p">)</span>
+        
+    <span class="c1"># template-dependent evidence statistics</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
+    <span class="n">exx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">template</span><span class="o">*</span><span class="n">template</span><span class="p">)</span>
+    <span class="n">exy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">template</span><span class="o">*</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">vx</span> <span class="o">=</span> <span class="n">exx</span> <span class="o">-</span> <span class="n">ex</span><span class="o">*</span><span class="n">ex</span> <span class="o">+</span> <span class="mf">1e-300</span> <span class="c1">## helps with over/underflow</span>
+    <span class="n">vxy</span> <span class="o">=</span> <span class="n">exy</span> <span class="o">-</span> <span class="n">ex</span><span class="o">*</span><span class="n">ey</span> <span class="o">+</span> <span class="mf">1e-300</span> <span class="c1">## helps with over/underflow</span>
+    <span class="n">r</span><span class="o">=</span> <span class="n">vxy</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">vx</span><span class="o">*</span><span class="n">vy</span><span class="p">)</span>
+    <span class="n">r2</span> <span class="o">=</span> <span class="n">r</span><span class="o">*</span><span class="n">r</span>
+    
+    <span class="c1"># evidence integral</span>
+    <span class="n">log_l</span> <span class="o">+=</span> <span class="o">-</span><span class="n">m</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">log_l</span> <span class="o">+=</span> <span class="o">-</span><span class="n">N</span><span class="o">/</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">log_l</span> <span class="o">+=</span> <span class="n">lgamma</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> 
+    <span class="n">log_l</span> <span class="o">+=</span> <span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vx</span><span class="p">)</span>
+    <span class="n">log_l</span> <span class="o">+=</span> <span class="o">-</span><span class="n">m</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vy</span><span class="p">)</span>
+    <span class="n">log_l</span> <span class="o">+=</span> <span class="o">-</span><span class="n">m</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.</span><span class="o">-</span><span class="n">r2</span><span class="p">)</span> 
+    <span class="n">log_l</span> <span class="o">+=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1">#log_l += np.log(1.+(r/np.abs(r))*sc.special.betainc(0.5,m,r2))   </span>
+
+    <span class="k">return</span> <span class="n">log_l</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We also create an evidence function corresponding to equation 2.2.4 in the SI of the Bayesian shape calculation paper. This function takes in data and returns the evidence that the input data can be described by a "flat" template.  Conceptually, this "flat" template can be thought of as a null case and alternative hypothesis; it represents the absence of shape, or latent structure, in the data.</p>
+<p>In the Bayesian shape calculation paper, we describe the importance of this null template as it allows us to move beyond "Which template in out set is optimal?" and instead ask the question: "Does the data look more like any of our templates than like uncorrelated noise?" By having this alternative hypothesis, we are not forced to overfit and choose the "best" answer from our set of templates. Instead, if no particular template has an evidence which dominates over the null template, we conclude that the data does not look like any of our templates.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@nb</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">[:]),</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">evidence_flat</span><span class="p">(</span><span class="n">data</span><span class="p">):</span> <span class="c1"># corresponds to Eq. 2.2.4 in SI for shape calculations</span>
+    
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="mf">2.</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span>
+
+    <span class="n">ey</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">eyy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">data</span><span class="o">*</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">vy</span> <span class="o">=</span> <span class="n">eyy</span> <span class="o">-</span> <span class="n">ey</span><span class="o">*</span><span class="n">ey</span> <span class="o">+</span> <span class="mf">1e-300</span> <span class="c1">## helps with over/underflow</span>
+
+    <span class="c1"># evidence integral</span>
+    <span class="n">log_l</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">log_l</span> <span class="o">+=</span> <span class="o">-</span><span class="p">(</span><span class="n">N</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">log_l</span> <span class="o">+=</span> <span class="n">lgamma</span><span class="p">(</span><span class="n">m</span> <span class="o">+.</span><span class="mi">5</span><span class="p">)</span> 
+    <span class="n">log_l</span> <span class="o">+=</span> <span class="o">-</span><span class="p">(</span><span class="n">m</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vy</span><span class="p">)</span>
+    <span class="n">log_del_b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1e5</span><span class="p">)</span>
+    <span class="n">log_del_tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1e5</span><span class="p">)</span>
+    <span class="n">log_l</span> <span class="o">-=</span> <span class="p">(</span><span class="n">log_del_b</span> <span class="o">+</span> <span class="n">log_del_tau</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">log_l</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In the previous notebook, the goal was to find two arbitrarily located signal jumps in a dataset of 600 data points.  To do so, an exhaustive set of 360,000 templates was created, wherein each template was the full length of the dataset, with all possible combinations of the 2 jump locations represented. This sort of general shape analysis is admittedly not very scalable.  Even for this small example of 2 jumps, the set of templates required grows as $\mathcal{O}(N^2)$ where $N$ is the number of points in the dataset.</p>
+<p>More generally, the set of templates required scales both with the number of data points, $N$ and the number of features to find, $R$, as $\mathcal{O}(N^{R})$.  The number of computations required, however, grows as $\mathcal{O}(N^{R+1})$.  We pick up an extra +1 in the exponent from generating and comparing all $N^R$ templates to $N$ data points.</p>
+<p>Below we have the code for generating our set of full data templates and calculating their associated evidences.  The bayes factor of the template evidences is compared to the bayes factor for the null evidence in a process known as Bayesian Model Selection (BMS). Once the templates which maximize this comparison are identified, we use them to return as the most probable locations for transitions.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@nb</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">[:,:](</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">[:],</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">full_shape_ev</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">prior_m</span><span class="p">):</span>
+    <span class="n">nt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">prior_m</span>
+    <span class="n">lnevs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nt</span><span class="p">,</span><span class="n">nt</span><span class="p">))</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nt</span><span class="p">):</span> <span class="c1">## sweep jump 1</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nt</span><span class="p">):</span> <span class="c1">## sweep jump 2</span>
+            <span class="c1">## make the template</span>
+            <span class="n">temp</span> <span class="o">*=</span> <span class="mi">0</span>
+            <span class="n">temp</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">temp</span><span class="p">[</span><span class="n">j</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">2</span>
+            
+            <span class="c1">## calculate evidence          </span>
+            <span class="n">lnevs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">evidence_template</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
+            
+    <span class="k">return</span> <span class="n">lnevs</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@nb</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">int64</span><span class="p">[:](</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">[:],</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">full_shape</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">prior_m</span><span class="p">):</span>
+    
+    <span class="c1">## calculate evidence          </span>
+    <span class="n">ln_evs</span> <span class="o">=</span> <span class="n">full_shape_ev</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">ln_evs</span><span class="p">))</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;NaN Alert&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_l</span> <span class="o">=</span> <span class="n">ln_evs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">_l</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">_l</span><span class="p">)</span>
+    
+    <span class="n">ln_prior</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">_l</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="c1">## equal 1/N priors</span>
+    <span class="n">joint</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">_l</span><span class="o">+</span><span class="n">ln_prior</span><span class="p">)</span>
+    
+    <span class="c1">## use BMS to find transitions</span>
+    <span class="n">bms_probs</span> <span class="o">=</span> <span class="n">joint</span><span class="o">/</span><span class="n">joint</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">bms_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">ln_evs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">_l</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">ln_evs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">i</span><span class="o">+</span><span class="n">ln_evs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">ln_evs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">bms_array</span><span class="p">[</span><span class="n">ind</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">bms_probs</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">ln_evs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        
+    <span class="n">transitions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">bms_array</span> <span class="o">==</span> <span class="n">bms_array</span><span class="o">.</span><span class="n">max</span><span class="p">()):</span>
+        <span class="n">transitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">transitions</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Here, instead of creating thousands of templates that span the entire dataset, we exploit the localized nature the features we are looking for.  We can generate a template that is just large enough to capture the behavior we are searching for, and then scan it across our dataset.  We perform the usual BMS calculation on a slice of our data corresponding to the template location, before translating over one datapoint and repeating the process.  In effect, this is equivalent to executing a linear search of our localized template through the full dataset (with the caveat that points on the edge will be missed).</p>
+<p>This approach greatly allievates the scaling headache faced by the more general shape calculation approach described above.  Here, we only need one template regardless of $N$, the size of our dataset.  Additionally, in this example, there are two transitions which have the same shape.  Since we can move our template, we don't have to treat them like distinct features and we can still use just one template, regardless of the number of transitions we have.  The number of calculations required for BITS grows as $\mathcal{O}(CN)$ where $C$ is the number of $\textbf{distinct}$ features we are searching for.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nd">@nb</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">nb</span><span class="o">.</span><span class="n">int64</span><span class="p">[:](</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">[:],</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span><span class="n">nb</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span><span class="n">nb</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">BITS</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">prior_m</span><span class="p">,</span> <span class="n">tail_size</span><span class="p">,</span> <span class="n">blur_size</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    
+    <span class="c1"># jump template</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    tmp_jump = np.ones(tmp_size,dtype=nb.float64)</span>
+<span class="sd">    for i in range(tmp_size):</span>
+<span class="sd">        if i &gt;= tmp_size / 2.:</span>
+<span class="sd">            tmp_jump[i] = 1.</span>
+<span class="sd">        else:</span>
+<span class="sd">            tmp_jump[i] = 0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+            
+    <span class="c1"># blurred template</span>
+    <span class="n">tt</span> <span class="o">=</span> <span class="n">tail_size</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">blur_size</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">tt</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">nb</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> 
+    <span class="n">tmp_size</span> <span class="o">=</span> <span class="n">blur_size</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">tt</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">tt</span><span class="p">,</span> <span class="n">tt</span><span class="o">+</span><span class="n">blur_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">temp</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ind</span><span class="p">))</span>
+    <span class="n">temp</span><span class="p">[</span><span class="o">-</span><span class="n">tt</span><span class="p">:]</span> <span class="o">=</span> <span class="mi">1</span>
+    
+    <span class="c1"># calculate evidences</span>
+    <span class="n">ev_jump</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">tmp_size</span><span class="p">)</span>
+    <span class="n">ev_flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">tmp_size</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">tmp_size</span><span class="p">):</span>
+        <span class="n">sub</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">tmp_size</span><span class="p">]</span>
+        <span class="c1">#print(type(sub[0]))</span>
+        <span class="n">ev_jump</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">evidence_template</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">prior_m</span><span class="p">,</span> <span class="n">temp</span><span class="p">)</span>
+        <span class="n">ev_flat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">evidence_flat</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span>
+    
+    <span class="c1"># use BMS to calculate posteriors</span>
+    <span class="c1">#ev_line = np.ones_like(ev_step) * -np.inf</span>
+    <span class="n">bayes_jump</span> <span class="o">=</span> <span class="n">ev_flat</span> <span class="o">-</span> <span class="n">ev_jump</span>
+    <span class="n">bayes_flat</span> <span class="o">=</span> <span class="n">ev_jump</span> <span class="o">-</span> <span class="n">ev_flat</span>
+    
+    <span class="n">prob_jump</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">bayes_jump</span><span class="p">))</span>
+    <span class="n">prob_flat</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">bayes_flat</span><span class="p">))</span> 
+    
+    <span class="c1"># taking out repeats</span>
+    <span class="n">jump</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">prob_jump</span><span class="o">&gt;=</span><span class="mf">0.85</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">jump</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">jump</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">jump</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+         <span class="n">transitions_jump</span> <span class="o">=</span> <span class="n">jump</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">jump</span><span class="p">))</span><span class="o">&lt;=</span><span class="n">tmp_size</span><span class="p">:</span>
+            <span class="n">jump_split</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">jump</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">jump</span><span class="p">)</span><span class="o">&gt;=</span><span class="n">tmp_size</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">transitions_jump</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">jump_split</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="n">nb</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">jump_split</span><span class="p">:</span>
+                <span class="n">transitions_jump</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">prob_jump</span><span class="p">[</span><span class="n">i</span><span class="p">])]</span>
+                <span class="n">ind</span> <span class="o">+=</span> <span class="mi">1</span> 
+      
+    <span class="k">return</span> <span class="n">transitions_jump</span> <span class="o">+</span> <span class="nb">round</span><span class="p">(</span><span class="n">tmp_size</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's take a look at how both of these methods scale.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="n">BITS_times</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">full_times</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">dp</span> <span class="o">=</span> <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">900</span><span class="p">,</span> <span class="mi">1200</span><span class="p">,</span> <span class="mi">1500</span><span class="p">,</span> <span class="mi">1800</span><span class="p">,</span> <span class="mi">2100</span><span class="p">,</span> <span class="mi">2400</span><span class="p">,</span> <span class="mi">2700</span><span class="p">,</span> <span class="mi">3000</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">dp</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> Datapoints complete&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+    <span class="c1">## generate data</span>
+    <span class="n">data</span><span class="p">,</span> <span class="n">tjumps</span><span class="p">,</span> <span class="n">snr</span> <span class="o">=</span> <span class="n">data_generator</span><span class="p">(</span><span class="n">num_points</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">num_jumps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">jump_size</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span> <span class="n">noise_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                                          <span class="n">drift_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">blur</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="mi">76</span><span class="p">)</span>
+
+    <span class="n">timers_bits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">timers_full</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="c1">#print(&#39;iteration %d&#39;%(i))</span>
+        <span class="c1">## time BITS</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">tran_BITS</span> <span class="o">=</span> <span class="n">BITS</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="n">blur_size</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">finish</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">tjumps</span> <span class="o">==</span> <span class="n">tran_BITS</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">timers_bits</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">finish</span><span class="o">-</span><span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;failed to find all transitions - BITS&#39;</span><span class="p">)</span>
+        
+        <span class="c1">## time full shape analysis</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">tran_full</span> <span class="o">=</span> <span class="n">full_shape</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">10</span><span class="o">**</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">finish</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">tjumps</span> <span class="o">==</span> <span class="n">tran_full</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">timers_full</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">finish</span><span class="o">-</span><span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;failed to find all transitions - full&#39;</span><span class="p">)</span>
+        
+    <span class="n">full_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">timers_full</span><span class="p">))</span>
+    <span class="n">BITS_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">timers_bits</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>300 Datapoints complete
+600 Datapoints complete
+900 Datapoints complete
+1200 Datapoints complete
+1500 Datapoints complete
+1800 Datapoints complete
+2100 Datapoints complete
+2400 Datapoints complete
+2700 Datapoints complete
+3000 Datapoints complete
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span> <span class="n">BITS_times</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;BITS&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span> <span class="n">full_times</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Full Dataset Template&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1">#plt.title(&#39;Linear Axes&#39;)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span><span class="mi">3100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Run Time (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;/home/anjali/Documents/BITS_figures/2Features_linear.pdf&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAVAAAAEGCAYAAAAzP80zAAAAOXRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjUuMSwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZy/YYfK9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAeUElEQVR4nO3df5RVdf3v8ecbHGG+oqAwGAI52OJSMDMMOLgyTdEJhjJlwkIKFb+WqFn69d4vN6gEslz2Fcui8t4vtwxKKllgMt3oAo0mq/Iqg0yAIOEPkoG5MICMEoOM8L5/7D3DMMww5+w5P2dej7XOOmd/zj7n895zDi/2j7P3x9wdERGJX490FyAikq0UoCIiESlARUQiUoCKiESkABURieisdBfQGQMGDPD8/Px0lyEiXcyGDRv2u3teR/NldYDm5+dTVVWV7jJEpIsxs3/EMp824UVEIlKAiohEpAAVEYkoq/eBtqWxsZGamhqOHj2a7lIky/Tu3ZshQ4aQk5OT7lIkS3S5AK2pqeHcc88lPz8fM0t3OZIl3J0DBw5QU1PDsGHD0l2OZIkutwl/9OhR+vfvr/CUuJgZ/fv315ZLV7ZpGTxWAPP7BfeblnX6LbvcGiig8JRI9L3pwjYtg9/dC40NwXT9rmAaoGhq5LftcmugIiKnqXzwZHg2aWwI2jtBAZoEPXv2pLi4mNGjRzN27Fj++te/ArBz504KCgpYvXo1xcXFFBcX06dPH0aMGEFxcTG33norR44cYfr06RQWFlJQUMCVV17J4cOH07xEIlmuvia+9hh1yU34eDyzcTcLVm9nz6EGLuqXy6yyEZSPGdyp98zNzaW6uhqA1atXM2fOHJ5//vnm58vKyigrKwNg/PjxPProo5SUlADw8MMPc+GFF7J582YAtm/frqPCIp3Vd0iw2d5Weyd06zXQZzbuZs7Tm9l9qAEHdh9qYM7Tm3lm4+6E9fHOO+9w/vnnxzx/bW0tgwefDPARI0bQq1evhNUj0i2VzoWc3FPbcnKD9k7o1mugC1Zvp6Hx+CltDY3HWbB6e6fWQhsaGiguLubo0aPU1tby7LPPxvza22+/nYkTJ7J8+XJKS0uZMWMGw4cPj1yLiHDyQFHlg8Fme98hQXh24gASdPMA3XOoIa72WLXchH/hhRe49dZb2bJlS0yvLS4u5o033mDNmjX88Y9/ZNy4cbzwwgt85CMf6VRNIt1e0dROB2Zr3TpAL+qXy+42wvKifrltzB3N5Zdfzv79+6mrq4v5NX369GHKlClMmTKFHj16sGrVKgWoSAbq1vtAZ5WNIDen5yltuTk9mVU2ImF9vPrqqxw/fpz+/fvHNP9f/vIX3n77bQCOHTvG1q1bufjiixNWj4gkTrdeA23az5noo/BN+0AhOEVwyZIl9OzZ88wvCr3++uvcfffduDsnTpzguuuu48Ybb+xUPSKSHJbN48KXlJR46wsqb9u2TZu7Epm+PwJgZhvcvaSj+br1JryISGcoQEVEIkpagJrZE2a2z8y2tGhbYGavmtkmM/utmfVr8dwcM3vNzLabWVmy6hIRSZRkroEuBia1alsLFLh7EfB3YA6AmY0EpgGjwtc8bmaxHXUREUmTpAWou68DDrZqW+Pu74eT/xdoOhF1MvAbd3/P3d8EXgMuS1ZtIiKJkM59oLcDfwgfDwZanulfE7aJiGSstASomX0DeB9Y2tTUxmxt/r7KzGaaWZWZVcVzdk8qNV3Orum2c+fOduddvHgxX/nKVwCYP38+jz766GnzzJ8/n8GDB1NcXMzw4cOZMmUKW7du7bCOxYsXs2fPnsjL0Zbq6mpWrVp1WvuZLtGXDH369Dnj84cOHeLxxx9PSt8iTVIeoGY2A/g0MN1P/gi1BhjaYrYhQJv/8t19kbuXuHtJXl5e5wtKwmX+m86Fb7rl5+d3+j3vv/9+qqur2bFjBzfddBPXXntth6eHpjJAy8rKmpe3pKSEpUuXUl1dzS9+8YuE9h8rBaikQkoD1MwmAV8DbnD3Iy2eqgCmmVkvMxsGDAdeSnpBTZf5r98F+MnL/CcgRFvLz89n//79AFRVVTF+/PjI73XTTTcxceJEfvWrXwHw4IMPMm7cOAoKCpg5cybuzvLly6mqqmL69OkUFxfT0NDQ5nwACxcuZOTIkRQVFTFt2jQA/vnPf3L77bczbtw4xowZw8qVKzl27Bhz587lqaeeori4mKeeeqrDWp988kkuu+wyiouLufPOOzl+PLj6VZ8+ffja177GpZdeyic+8Qleeuklxo8fzyWXXEJFRQUQ/AcwefJkJk2axIgRI/jWt7512vsfPnyY0tJSxo4dS2FhIStXrgRg9uzZvP766xQXFzNr1iwAFixYwLhx4ygqKmLevHmR//4izdw9KTfg10At0EiwhvlFgoNDu4Dq8PY/W8z/DeB1YDvwyVj6uPTSS721rVu3ntbWru+Pcp933um374+K/T3a0KNHDx89erSPHj3ay8vL3d394osv9rq6Ond3X79+vV999dXu7v7zn//c77nnHnd3nzdvni9YsOC092ur/bHHHvO77rrL3d0PHDjQ3H7zzTd7RUWFu7tfffXVvn79+ubn2ptv0KBBfvToUXd3f/vtt93dfc6cOf7LX/6yuW348OF++PDhU+ptT1O/W7du9U9/+tN+7Ngxd3e/++67fcmSJe7uDviqVavc3b28vNwnTJjgx44d8+rqah89enTz3+YDH/iA79+/348cOeKjRo1qXp5zzjnH3d0bGxu9vr7e3d3r6ur8Qx/6kJ84ccLffPNNHzXq5Oe4evVqv+OOO/zEiRN+/Phxv+666/z5558/rfa4vj/SZQFVHkMGJe1ceHf/fBvNPzvD/A8BDyWrnjYl6TL/LS9nlyze4hTc5557jkceeYQjR45w8OBBRo0axfXXX3/aa9qbr6ioiOnTp1NeXk55eTkAa9asoaKionmf7NGjR3nrrbfiqrGyspINGzYwbtw4ILhGwMCBAwE4++yzmTQp+JVbYWEhvXr1Iicnh8LCwlP2GU+YMKH5QixTpkzhz3/+c/PV+5v+Dl//+tdZt24dPXr0YPfu3ezdu/e0WtasWcOaNWsYM2YMEKy57tixg6uuuiquZRJpqVtfTCRZl/lvy1lnncWJEycAEjJ07saNGykpKeHo0aN8+ctfpqqqiqFDhzJ//vw23/9M8/3+979n3bp1VFRU8O1vf5tXXnkFd2fFihWMGHHqlalefPHFmGt0d2bMmMHDDz982nM5OTnNo2D26NGj+ar7PXr04P3332+er/VIma2nly5dSl1dHRs2bCAnJ4f8/Pw2l9/dmTNnDnfeeWfM9Yt0pHufypmky/y3JT8/nw0bNgCwYsWKTr3XihUrWLNmDZ///Oebw2LAgAEcPnyY5cuXN8937rnn8u677wK0O9+JEyfYtWsX11xzDY888giHDh3i8OHDlJWV8aMf/ah5TXfjxo2nvWdHSktLWb58Ofv27QPg4MGD/OMf/4hrWdeuXcvBgwdpaGjgmWee4Yorrjjl+fr6egYOHEhOTg7PPfdc8/u3rrOsrIwnnniieYC+3bt3N9clElX3DtCiqXD9Qug7FLDg/vqFCb9qNcC8efO47777+PjHPx7zpe1aeuyxx5p/xvTkk0/y7LPPkpeXR79+/bjjjjsoLCykvLy8eXMZ4LbbbuOuu+6iuLiYXr16tTnf8ePHufnmmyksLGTMmDHcf//99OvXjwceeIDGxkaKioooKCjggQceAOCaa65h69atMR1EGjlyJN/5zneYOHEiRUVFTJgwgdra2riW+8orr+SWW26huLiYG2+88ZTNd4Dp06dTVVXVfOT/wx/+MAD9+/fniiuuoKCggFmzZjFx4kS+8IUvcPnll1NYWMhnP/vZmP8jEGmPLmcnGWvx4sVUVVXx4x//OGV96vsjoMvZiYgkXfc+iCQZ7bbbbuO2225Ldxki7eqSa6DZvFtC0kffG4lXlwvQ3r17c+DAAf1jkLi4OwcOHKB3797pLkWySJfbhB8yZAg1NTVxDSMsAsF/vkOGJP43wNJ1dbkAzcnJYdiwYekuQ0S6gS63CS8ikioKUBGRiBSgIiIRKUBFRCJSgIqIRKQAFRGJSAEqIhKRAlREJCIFqIhIRApQEZGIFKAiIhEpQEVEIkpagJrZE2a2z8y2tGi7wMzWmtmO8P78Fs/NMbPXzGy7mZUlqy4RkURJ5hroYmBSq7bZQKW7Dwcqw2nMbCQwDRgVvuZxM4t/5DURkRRKWoC6+zrgYKvmycCS8PESoLxF+2/c/T13fxN4DbgsWbWJiCRCqveBXujutQDh/cCwfTCwq8V8NWHbacxspplVmVmVLposIumUKQeRrI22NsfkcPdF7l7i7iV5eXlJLktEpH2pDtC9ZjYIILzfF7bXAENbzDcE2JPi2kRE4pLqAK0AZoSPZwArW7RPM7NeZjYMGA68lOLaRETikrQxkczs18B4YICZ1QDzgO8Cy8zsi8BbwOcA3P0VM1sGbAXeB+5x9+PJqk1EJBGSFqDu/vl2niptZ/6HgIeSVY+IZJBNy6DyQaivgb5DoHQuFE1Nd1Vx63KjcopIhtu0DH53LzQ2BNP1u4JpyLoQzZSj8CLSXVQ+eDI8mzQ2BO1ZRgEqIqlVXxNfewZTgIpIavUdEl97BlOAikhqlc6FnNxT23Jyg/YsowAVkdQqmgrXL4S+QwEL7q9fmHUHkEBH4UUkHYqmZmVgtqY1UBGRiBSgIiIRKUBFRCJSgIqIRKQAFRGJSAEqIhKRAlREJCIFqIhIRApQEZGIFKAiIhEpQEVEIlKAiohE1OHFRMzscuBm4OPAIKAB2AL8HnjS3euTWqGISIY64xqomf0B+BKwGphEEKAjgW8CvYGVZnZDsosUEclEHa2B3uLu+1u1HQZeDm/fM7MB8XZqZvcTBLMDm4F/Bf4FeArIB3YCU9397XjfW0QkVc64BtoUnmZ2jpn1CB//FzO7wcxyWs4TKzMbDNwLlLh7AdATmAbMBirdfThQGU6LiGSsWA8irQN6h+FXSbDGuLgT/Z4F5JrZWQRrnnuAycCS8PklQHkn3l9EJOliDVBz9yPAFOBH7v4Zgn2hcXP33cCjwFtALVDv7muAC929NpynFhgY5f1FRFIl5gANj8ZPJzj6DhGHAzGz8wnWNocBFwHnmNnNcbx+pplVmVlVXV1dlBJERBIi1gC9D5gD/NbdXzGzS4DnIvb5CeBNd69z90bgaeBjwF4zGwQQ3u9r68XuvsjdS9y9JC8vL2IJIiKdF9NapLuvI9gP2jT9BsGBoCjeAj5qZv9C8JvSUqAK+CcwA/hueL8y4vuLiKRER78DXWRmhe08d46Z3W5m0+Pp0N1fBJYT/Axqc1jDIoLgnGBmO4AJ4bSISMbqaA30ceCBMES3AHUEP6AfDpwHPAEsjbdTd58HzGvV/B7B2qiISFY4Y4C6ezUw1cz6ACWcPJVzm7tvT355IiKZK9Z9oIeBPyW3FBGR7KKrMYmIRKQAFRGJKK4ANbNzklWIiEi2iSlAzexjZrYV2BZOjzazx5NamYhIhot1DfQxoAw4AODufwOuSlZRIiLZIOZNeHff1arpeIJrERHJKrFeEGSXmX0McDM7m+A0zm3JK0tEJPPFugZ6F3APMBioAYrDaRGRbivWH9LvJ7iUnYiIhGIKUDMbBnyVYLyi5te4uwaUE5FuK9Z9oM8APwN+B5xIWjUiIlkk1gA96u4Lk1qJiKTHpmVQ+SDU10DfIVA6F4qmpruqrBBrgP7QzOYBawguOweAu7+clKpEJDU2LYPf3QuNDcF0/a5gGhSiMYg1QAuBW4BrObkJ7+G0iGSrygdPhmeTxoagXQHaoVgD9DPAJe5+LJnFiEiK1dfE1y6niPV3oH8D+iWxDhFJh75D4muXU8QaoBcCr5rZajOraLolszARSYHSuZCTe2pbTm7QLh2KdRO+9fhFItIVNO3n1FH4SGI9E+n5ZBciImlSNFWBGdEZA9TM/uzuV5rZuwRH3ZufAtzdz0tqdSIiGayjNdBZAO5+biI7NbN+wE+BAoJgvh3YDjxFcLroTmCqu7+dyH5FRBKpo4NIP0lSvz8E/o+7fxgYTXBpvNlApbsPByrDaRGRjNVRgFqiOzSz8wiuZv8zAHc/5u6HgMnAknC2JUB5ovsWEUmkjjbhh53p50oRr8Z0CVAH/NzMRgMbgPuAC929NnzfWjMb2NaLzWwmMBPggx/8YITuRUQSo6MArQO+l4Q+xwJfdfcXzeyHxLG57u6LgEUAJSUl3sHsIiJJ01GAvpuEnzDVADXu/mI4vZwgQPea2aBw7XMQsC/B/YqIJFRH+0B3JrpDd/9/BGMsjQibSoGtQAUwI2ybAaxMdN8iIol0xjVQd5+SpH6/CiwNB6h7A/hXgjBfZmZfBN4CPpekvkVEEiLWUzkTyt2rgZI2nipNcSkiIpHFPC68iIicKuY1UDMbDFzMqYPKrUtGUSIi2SDWUTn/A7iJ4GDP8bDZAQWoiHRbsa6BlgMj3P29jmYUEekuYt0H+gaQk8xCRESyTaxroEeAajOr5NRROe9NSlUiIlkg1gCtCG8iIhKK9Yr0SzqeS0Ske4n1KPybnHpFegDc/ZKEVyQikiVi3YRvedZQb4LTLC9IfDkiItkjpqPw7n6gxW23u/8AuDa5pYmIZLZYN+HHtpjsQbBGmtBxkkREsk2sm/AtL6r8PsFl7nS1JBHp1mI9Cn9Ny2kzO4vg1M6/J6MoEZFscMZ9oGZ2npnNMbMfm9kEC3wFeA2YmpoSRUQyU0droL8E3gZeAO4A/jtwNlAeXtNTRKTb6ihAL3H3QgAz+ymwH/igu7+b9MpERDJcRz9jamx64O7HgTcVniJJtGkZPFYA8/sF95uWpbsiOYOO1kBHm9k74WMDcsNpA9zdz0tqdSLdyaZl8Lt7obEhmK7fFUwDFOmQQyY64xqou/d09/PC27nuflaLxwpPkUSqfPBkeDZpbAjaJSNpTCSRTFFfE1+7pJ0CVCRT9B0SX7ukXdoC1Mx6mtlGM/vf4fQFZrbWzHaE9+enqzaRtCidCzm5p7bl5AbtkpHSuQZ6H7CtxfRsoNLdhwOV4bRI91E0Fa5fCH2HAhbcX79QB5AyWMzDGieSmQ0BrgMeAv5r2DwZGB8+XgL8CfhaqmsTSauiqQrMLJKuNdAfEJzVdKJF24XuXgsQ3g9s64VmNtPMqsysqq6uLumFioi0J+UBamafBva5+4Yor3f3Re5e4u4leXl5Ca5ORCR26diEvwK4wcw+RXB1+/PM7Elgr5kNcvdaMxsE7EtDbSIiMUv5Gqi7z3H3Ie6eD0wDnnX3mwlG/ZwRzjYDWJnq2kRE4pFJvwP9LjDBzHYAE8JpEZGMlZaj8E3c/U8ER9tx9wNAaTrrERGJRyatgYqIZBUFqIhIRApQEZGIFKAiIhEpQEVEIlKAiohEpAAVEYlIASoiEpECVKQ9GiFTOpDWM5FEMpZGyJQYaA1UpC0aIVNioAAVaYtGyJQYKEBF2qIRMiUGClCRtmiETImBAlSkLRohU2Kgo/Ai7dEImdIBrYGKiESkABURiUgBKiISkQJURCQiBaiISEQpD1AzG2pmz5nZNjN7xczuC9svMLO1ZrYjvD8/1bWJiMQjHWug7wP/zd0/AnwUuMfMRgKzgUp3Hw5UhtMiIhkr5QHq7rXu/nL4+F1gGzAYmAwsCWdbApSnujYRkXikdR+omeUDY4AXgQvdvRaCkAUGtvOamWZWZWZVdXV1KatVRKS1tAWomfUBVgD/5u7vxPo6d1/k7iXuXpKXl5e8AkVEOpCWADWzHILwXOruT4fNe81sUPj8IGBfOmoTEYlVOo7CG/AzYJu7f7/FUxXAjPDxDGBlqmuTDKbhNSQDpeNiIlcAtwCbzaw6bPs68F1gmZl9EXgL+FwaapNMpOE1JEOlPEDd/c+AtfN0aSprkSxxpuE1FKCSRjoTSTKfhteQDKUAlcyn4TUkQylAJfNpeA3JUApQyXwaXkMylIb0kOyg4TUkA2kNVEQkIgWoiEhEClARkYgUoCIiESlAJRqdmy6io/ASgc5NFwG0BipRnOncdJFuRAEq8dO56SKAAlSi0LnpIoACVKLQuekigAJUotC56SKAjsJ3DZuWBQdw6muCzejSuckPM52bLqIAzXr6SZFI2mgTPtvpJ0UiaaMAzXb6SZFI2ihAEy3VpzjqJ0UiaaMATaSm/ZH1uwA/uT8ymSGqnxSJpE3GHUQys0nAD4GewE/d/btR32t9xX8y9OUFDPQ69lkeu8bOYtwNdyas1tOkY/jdoqms3/l2uJz72WcD2FU4i3FJPoD0zMbdLFi9nT2HGrioXy6zykZQPmZwl+lPfarPWGRUgJpZT+AnwASgBlhvZhXuvjXe91pf8Z8UbPgmuXYMDD5AHX03fJP1kLQQ9fqaNge8b689EZ7ZuJs56y+mofGHzW2563vy8NDdSftCPrNxN3Oe3kxD43EAdh9qYM7TmwGS0meq+1Of6jNWmbYJfxnwmru/4e7HgN8Ak6O80dCXFwTh2UKuHWPoyws6X2U79jIgrvZEWLB6e/OXoklD43EWrN7eZfrsDsuoPrOzz0wL0MHArhbTNWFbMzObaWZVZlZVV1fX7hsN9LafG+j7E1Bm2x4+9jmO+NmntB3xs3n42OeS1ueeQw1xtWdjn91hGdVndvaZaQHa5hbwKRPui9y9xN1L8vLy2n2jfdb2c/sseWuDVedNYHbjl6g5MYATbtScGMDsxi9Rdd6EpPV5Ub/cuNqzsc/usIzqMzv7zLQArQGGtpgeAuyJ8ka7xs6iodXaYIOfza6xs6JX14FZZSNY2/Nqrjy2kEveW8qVxxaytufVzCobkdQ+c3N6ntKWm9OzS/XZHZZRfWZnnxl1EAlYDww3s2HAbmAa8IUobzTuhjtZD6cenb40uUfhm3ZGp/LoYnfoszsso/rMzj7N3TueK4XM7FPADwh+xvSEuz/U3rwlJSVeVVWVqtJEpJswsw3uXtLRfJm2Boq7rwJWpbsOEZGOZNo+UBGRrKEAFRGJSAEqIhKRAlREJKKMOwofDzOrA/6R4m4HAMk7nSn5VH96ZXv9kP3LEEv9F7t7+2fqhLI6QNPBzKpi+XlDplL96ZXt9UP2L0Mi69cmvIhIRApQEZGIFKDxW5TuAjpJ9adXttcP2b8MCatf+0BFRCLSGqiISEQKUBGRiBSgrZjZTjPbbGbVZlYVtl1gZmvNbEd4f36L+eeY2Wtmtt3MytJU8xNmts/MtrRoi7tmM7s0XPbXzGyhmSVrKKdY6p9vZrvDz6E6vEpXxtVvZkPN7Dkz22Zmr5jZfWF7Nv3921uGbPkMepvZS2b2t7D+b4Xtyf8M3F23FjdgJzCgVdsjwOzw8WzgP8LHI4G/Ab2AYcDrQM801HwVMBbY0pmagZeAywlGBvgD8Mk01j8f+Pc25s2o+oFBwNjw8bnA38Mas+nv394yZMtnYECf8HEO8CLw0VR8BloDjc1kYEn4eAlQ3qL9N+7+nru/CbxGMDBeSrn7OuBgq+a4ajazQcB57v6CB9+kX7R4TVK1U397Mqp+d69195fDx+8C2wjG8cqmv397y9CejFoGDxwOJ3PCm5OCz0ABejoH1pjZBjObGbZd6O61EHzZgIFhe4eD4KVRvDUPDh+3bk+nr5jZpnATv2nzK2PrN7N8YAzBGlBW/v1bLQNkyWdgZj3NrBrYB6x195R8BgrQ013h7mOBTwL3mNlVZ5i3w0HwMlB7NWfasvwP4ENAMVALfC9sz8j6zawPsAL4N3d/50yzttGW9vqhzWXIms/A3Y+7ezHBOGqXmVnBGWZPWP0K0FbcfU94vw/4LcEm+d5w9Z7wfl84e8IGwUuCeGuuCR+3bk8Ld98b/qM4AfwvTu4aybj6zSyHIHiWuvvTYXNW/f3bWoZs+gyauPsh4E/AJFLwGShAWzCzc8zs3KbHwERgC1ABzAhnmwGsDB9XANPMrJcFA+ENJ9gJnQniqjncxHnXzD4aHnm8tcVrUq7pix/6DMHnABlWf9jXz4Bt7v79Fk9lzd+/vWXIos8gz8z6hY9zgU8Ar5KKzyDZR8iy6QZcQnB07m/AK8A3wvb+QCWwI7y/oMVrvkFwFG87KTpq2kbdvybYxGok+F/0i1FqBkoI/pG8DvyY8Ey1NNX/S2AzsCn8wg/KxPqBKwk28zYB1eHtU1n2929vGbLlMygCNoZ1bgHmhu1J/wx0KqeISETahBcRiUgBKiISkQJURCQiBaiISEQKUBGRiBSg0qWZmZvZ91pM/7uZzU9jSdKFKEClq3sPmGJmA9JdiHQ9ClDp6t4nGAPn/nQXIl2PAlS6g58A082sb7oLka5FASpdngdXFvoFcG+6a5GuRQEq3cUPCM6xPyfNdUgXogCVbsHdDwLLCEJUJCEUoNKdfA/Q0XhJGF2NSUQkIq2BiohEpAAVEYlIASoiEpECVEQkIgWoiEhEClARkYgUoCIiEf1/jwCvOsWoNL4AAAAASUVORK5CYII=
+" />
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We note some exponential behavior for the full dataset template curve, while the BITS times grow linearly.  Let's investigate further with a loglog plot.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">curve_fit</span>
+
+<span class="c1">## log plotting</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">BITS_times</span><span class="p">),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;BITS&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">full_times</span><span class="p">),</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Full Dataset Template&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1">## curve-fitting</span>
+<span class="k">def</span> <span class="nf">linear</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">m</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="n">b</span>
+
+<span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">linear</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">BITS_times</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="n">linear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="n">popt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">popt</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="s1">&#39;k--&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;BITS fit: y = </span><span class="si">%.3f</span><span class="s1">*m + </span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">popt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">popt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">3</span><span class="p">)))</span>
+
+<span class="n">popt</span><span class="p">,</span> <span class="n">pcov</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">linear</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">full_times</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="n">linear</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dp</span><span class="p">),</span> <span class="n">popt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">popt</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="s1">&#39;k--&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Full Dataset Template fit: y = </span><span class="si">%.3f</span><span class="s1">*m + </span><span class="si">%.3f</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">popt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">popt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">3</span><span class="p">)))</span>
+
+<span class="c1">## finishing up plot</span>
+<span class="c1">#plt.title(&#39;Log-Log Plot&#39;);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Log(N)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Log(Run Time) (s)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;/home/anjali/Documents/BITS_figures/2Features_loglog.pdf&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>BITS fit: y = 1.031*m + -14.486
+Full Dataset Template fit: y = 2.915*m + -18.509
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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
+" />
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>After fitting, we see that our Big-$\mathcal{O}$ predictions are empirically confirmed.  The BITS slope is $\approx 1$ which matches $\mathcal{O}(CN) = \mathcal{O}(N)$, while the full dataset slope is $\approx 3$ which matches $\mathcal{O}(N^{R+1}) = \mathcal{O}(N^{3})$.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><a class="u-url" href="/examples/2022/09/08/Transition-BITS.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/examples/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/examples/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/examples/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>Using Bayesian inference to calculate the shape of data.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/bayes-shape-calc" target="_blank" title="bayes-shape-calc"><svg class="svg-icon grey"><use xlink:href="/examples/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
