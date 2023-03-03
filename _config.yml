@@ -45,7 +45,6 @@ minima:
   social_links:
     #twitter: fastdotai
     #github: bayes-shape-calc
-    - { platform: github,  user_url: "https://github.com/jekyll/jekyll" }
 
 # Set this to true to get LaTeX math equation support
 use_math: true
