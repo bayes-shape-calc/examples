@@ -1,0 +1,43 @@
+---
+title: "Bayesian Shape Calculation Examples"
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+  sort-ui: false
+  filter-ui: false
+page-layout: full
+title-block-banner: false
+---
+
+This example gallery contains proof-of-principle examples showcasing how [calculations of the shape of data using Bayesian inference](https://bayes-shape-calc.github.io) can 
+be utilized in techniques throughout the physical and life sciences. 
+
+These implementations focus on "toy problems" that mimic real experimental systems. Their purpose is not to provide robust solutions, but rather to demonstrate
+the breadth and simplicity of the Bayesian shape calcuation method. While the code and concepts displayed here are currently preliminary, we hope to 
+develop them into stand-alone solutions in the future. In the meantime, the code for these examples is freely available for use.
+
+::: {layout-nrows=2}
+![Peak Finding](images/ex_bits.png){fig-align="center"}
+<!-- ![Aperture Masking](images/ex_microscope.png){fig-align="center"} -->
+:::
+
+
+# More Information
+If these examples and/or the
+associated code are useful in your research project, please cite:
+
+
+[Ray, K. K., Verma, A. R., Gonzalez Jr, R. L., Kinz-Thompson, C. D. (2022). Inferring the shape of data: A probabilistic framework for analyzing experiments in the natural sciences. Proc. R. Soc. A. **478**: 20220177. DOI: 10.1098/rspa.2022.0177](https://royalsocietypublishing.org/doi/10.1098/rspa.2022.0177)
+
+View the preprint: [arXiv:2109.12462](https://arxiv.org/abs/2109.12462)
+
+
+
+# Examples
+
+
+
+
+

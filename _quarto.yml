@@ -1,0 +1,20 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Bayesian Shape Calculation Examples"
+  site-url: https://bayes-shape-calc.github.io/examples/
+  navbar:
+    right:
+      - icon: github
+        href: https://github.com/bayes-shape-calc
+    logo: images/favicon.ico
+  favicon: images/favicon.ico
+format:
+  html:
+    theme: litera
+    css: styles.css
+
+
+
