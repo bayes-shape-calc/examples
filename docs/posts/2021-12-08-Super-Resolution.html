@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Korak Ray, Anjali Verma, Ruben Gonzalez and Colin Kinz-Thompson">
+<meta name="dcterms.date" content="2021-12-08">
+<meta name="description" content="This notebook is an example of how to super resolve spots in fluorescence microscopy data (a la Single-Molecule Localization Microscopy).">
+
+<title>Bayesian Shape Calculation Examples - Super-resolution Microscopy using BITS</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/favicon.ico" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Bayesian Shape Calculation Examples</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/bayes-shape-calc"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#initial-localization" id="toc-initial-localization" class="nav-link" data-scroll-target="#initial-localization">Initial localization</a></li>
+  <li><a href="#zooming-in" id="toc-zooming-in" class="nav-link" data-scroll-target="#zooming-in">Zooming in</a></li>
+  <li><a href="#final-localization" id="toc-final-localization" class="nav-link" data-scroll-target="#final-localization">Final Localization</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Super-resolution Microscopy using BITS</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">fluorescence</div>
+    <div class="quarto-category">SMLM</div>
+    <div class="quarto-category">microscopy</div>
+    <div class="quarto-category">single-molecule</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    This notebook is an example of how to super resolve spots in fluorescence microscopy data (a la Single-Molecule Localization Microscopy).
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Korak Ray, Anjali Verma, Ruben Gonzalez and Colin Kinz-Thompson </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">December 8, 2021</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">March 19, 2023</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p><a href="https://en.wikipedia.org/wiki/Super-resolution_microscopy">Super resolution microscopy</a> is an imaging technique where the diffraction limit is circumvented by localizing the center of diffraction-limited fluorophore “spots”.</p>
+<p>Here, we localize these spots in an image by finding the pixels (and later, the locations inside a pixel) where the templates for these spots have maximum evidence of matching the local shape of the data.</p>
+<div class="cell" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> betainc,betaln,gammaln</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lnevidence(x,y):</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    N<span class="op">=</span><span class="bu">float</span>(x.size)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    ex <span class="op">=</span> np.nanmean(x)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    exx <span class="op">=</span> np.nanmean(x<span class="op">*</span>x)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    ey <span class="op">=</span> np.nanmean(y)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    eyy <span class="op">=</span> np.nanmean(y<span class="op">*</span>y)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    exy <span class="op">=</span> np.nanmean(x<span class="op">*</span>y)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    vx <span class="op">=</span> exx <span class="op">-</span> ex<span class="op">*</span>ex <span class="op">+</span> <span class="fl">1e-300</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    vy <span class="op">=</span> eyy <span class="op">-</span> ey<span class="op">*</span>ey <span class="op">+</span> <span class="fl">1e-300</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    vxy <span class="op">=</span> exy <span class="op">-</span> ex<span class="op">*</span>ey <span class="op">+</span> <span class="fl">1e-300</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    r <span class="op">=</span> vxy<span class="op">/</span>np.sqrt(vx<span class="op">*</span>vy)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    r2 <span class="op">=</span> r<span class="op">*</span>r</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> (N<span class="op">-</span><span class="fl">2.</span>)<span class="op">/</span><span class="fl">2.</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    lndels <span class="op">=</span> <span class="fl">3.</span><span class="op">*</span>np.log(<span class="fl">1e30</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    lnev <span class="op">=</span> gammaln(M) <span class="op">-</span> N<span class="op">/</span><span class="fl">2.</span><span class="op">*</span>np.log(N) <span class="op">-</span><span class="fl">.5</span><span class="op">*</span>np.log(vx) <span class="op">-</span> np.log(<span class="fl">2.</span>) <span class="op">-</span> lndels <span class="op">-</span> M<span class="op">*</span>(np.log(np.pi)<span class="op">+</span>np.log(vy)<span class="op">+</span>np.log(<span class="fl">1.</span><span class="op">-</span>r2)) <span class="op">+</span> np.log(<span class="fl">1.</span><span class="op">+</span>np.sign(r)<span class="op">*</span>betainc(<span class="fl">.5</span>,M,r2))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> lnev</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>First, let us simulate a fluorescence image of a single molecule. To replicate a realistic dataset, we add Poisson noise to our image.</p>
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">8</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>nxy <span class="op">=</span> <span class="dv">17</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>w <span class="op">=</span> <span class="fl">1.25</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>I0 <span class="op">=</span> <span class="fl">80.</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>offset <span class="op">=</span> <span class="fl">200.</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>bounds <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>extra_molecules <span class="op">=</span> <span class="dv">4</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>mu <span class="op">=</span> (np.random.rand(<span class="dv">2</span>)<span class="op">-</span><span class="fl">.5</span>)<span class="op">*</span>bounds</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>xy <span class="op">=</span> np.linspace(<span class="op">-</span>(nxy<span class="op">-</span><span class="fl">1.</span>)<span class="op">//</span><span class="dv">2</span>,(nxy<span class="op">-</span><span class="fl">1.</span>)<span class="op">//</span><span class="dv">2</span>,nxy)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>gx,gy <span class="op">=</span> np.meshgrid(xy,xy,indexing<span class="op">=</span><span class="st">'ij'</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> np.random.poisson(I0<span class="op">*</span>np.exp(<span class="op">-</span><span class="fl">.5</span><span class="op">/</span>(w<span class="op">**</span><span class="fl">2.</span>)<span class="op">*</span>((mu[<span class="dv">0</span>]<span class="op">-</span>gx)<span class="op">**</span><span class="fl">2.</span><span class="op">+</span>(mu[<span class="dv">1</span>]<span class="op">-</span>gy)<span class="op">**</span><span class="fl">2.</span>))) <span class="op">+</span> <span class="fl">0.</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Nphotons (main)'</span>,z.<span class="bu">sum</span>())</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Centroid (main) </span><span class="sc">%.3f</span><span class="st"> </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(mu[<span class="dv">1</span>],mu[<span class="dv">0</span>]))</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>z <span class="op">+=</span> offset</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>separate <span class="op">=</span> np.zeros((extra_molecules<span class="op">+</span><span class="dv">1</span>,nxy,nxy))</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>separate[<span class="dv">0</span>] <span class="op">=</span> z.copy()</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(extra_molecules):</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    _mu <span class="op">=</span> (np.random.rand(<span class="dv">2</span>)<span class="op">-</span><span class="fl">.5</span>)<span class="op">*</span>nxy<span class="op">*</span><span class="fl">1.1</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    _z <span class="op">=</span> np.random.poisson(I0<span class="op">*</span>np.exp(<span class="op">-</span><span class="fl">.5</span><span class="op">/</span>(w<span class="op">**</span><span class="fl">2.</span>)<span class="op">*</span>((_mu[<span class="dv">0</span>]<span class="op">-</span>gx)<span class="op">**</span><span class="fl">2.</span><span class="op">+</span>(_mu[<span class="dv">1</span>]<span class="op">-</span>gy)<span class="op">**</span><span class="fl">2.</span>))) <span class="op">+</span> <span class="fl">0.</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    z <span class="op">+=</span> _z</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    separate[i<span class="op">+</span><span class="dv">1</span>] <span class="op">=</span> _z.copy()</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>fig,ax<span class="op">=</span>plt.subplots(<span class="dv">1</span>,figsize<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">6</span>))</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Composite'</span>)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>ax.imshow(z,interpolation<span class="op">=</span><span class="st">'nearest'</span>,cmap<span class="op">=</span><span class="st">'Greys_r'</span>,origin<span class="op">=</span><span class="st">'lower'</span>,extent<span class="op">=</span>[xy.<span class="bu">min</span>(),xy.<span class="bu">max</span>(),xy.<span class="bu">min</span>(),xy.<span class="bu">max</span>()])</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>ax.axvline(mu[<span class="dv">0</span>],color<span class="op">=</span><span class="st">'r'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>ax.axhline(mu[<span class="dv">1</span>],color<span class="op">=</span><span class="st">'r'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> extra_molecules <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,separate.shape[<span class="dv">0</span>],figsize<span class="op">=</span>(separate.shape[<span class="dv">0</span>]<span class="op">*</span><span class="fl">2.</span>,<span class="dv">2</span>))</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    fig.suptitle(<span class="st">'Separate Molecules'</span>)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(separate.shape[<span class="dv">0</span>]):</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        ax[i].imshow(separate[i],interpolation<span class="op">=</span><span class="st">'nearest'</span>,cmap<span class="op">=</span><span class="st">'Greys_r'</span>,origin<span class="op">=</span><span class="st">'lower'</span>,extent<span class="op">=</span>[xy.<span class="bu">min</span>(),xy.<span class="bu">max</span>(),xy.<span class="bu">min</span>(),xy.<span class="bu">max</span>()])</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Nphotons (main) 750.0
+Centroid (main) 0.469 0.373</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-08-Super-Resolution_files/figure-html/cell-4-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-08-Super-Resolution_files/figure-html/cell-4-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="initial-localization" class="level1">
+<h1>Initial localization</h1>
+<p>First, we grid the image into coarsely spread out points where a molecule might be centered. We’ll generate a template with some chosen guess width, and using the wrong noise model (i.e.&nbsp;Gaussian noise instead of Poisson noise), calculate the evidence for each template. We will zoom in on whichever grid point gives us the best evidence for the next step.</p>
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ns <span class="op">=</span> <span class="dv">20</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sxy <span class="op">=</span> np.linspace(xy.<span class="bu">min</span>(),xy.<span class="bu">max</span>(),ns)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> np.zeros((ns,ns))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ww <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tqdm.notebook <span class="im">import</span> trange</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> trange(sxy.size):</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(sxy.size):</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        mx <span class="op">=</span> sxy[i]</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        my <span class="op">=</span> sxy[j]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        template <span class="op">=</span> np.exp(<span class="op">-</span><span class="fl">.5</span><span class="op">/</span>(ww<span class="op">**</span><span class="fl">2.</span>)<span class="op">*</span>((mx<span class="op">-</span>gx)<span class="op">**</span><span class="fl">2.</span><span class="op">+</span>(my<span class="op">-</span>gy)<span class="op">**</span><span class="fl">2.</span>))</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>        out[i,j] <span class="op">=</span> lnevidence(template,z)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#### Only use the central spot in this examples. Often other spots win first sighting....</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>omax <span class="op">=</span> out[nxy<span class="op">//</span><span class="dv">2</span><span class="op">-</span><span class="dv">2</span>:nxy<span class="op">//</span><span class="dv">2</span><span class="op">+</span><span class="dv">2</span><span class="op">+</span><span class="dv">1</span>,nxy<span class="op">//</span><span class="dv">2</span><span class="op">-</span><span class="dv">2</span>:nxy<span class="op">//</span><span class="dv">2</span><span class="op">+</span><span class="dv">2</span><span class="op">+</span><span class="dv">1</span>].<span class="bu">max</span>()</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(sxy.size):</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(sxy.size):</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> out[i,j] <span class="op">==</span> omax:</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>            mx <span class="op">=</span> sxy[i]</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>            my <span class="op">=</span> sxy[j]</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Truth </span><span class="sc">%.3f</span><span class="st"> </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(mu[<span class="dv">1</span>],mu[<span class="dv">0</span>]))</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Found </span><span class="sc">%.3f</span><span class="st"> </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(my,mx))</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">6</span>))</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].imshow(out,interpolation<span class="op">=</span><span class="st">'nearest'</span>,cmap<span class="op">=</span><span class="st">'viridis'</span>,origin<span class="op">=</span><span class="st">'lower'</span>,extent<span class="op">=</span>[sxy.<span class="bu">min</span>(),sxy.<span class="bu">max</span>(),sxy.<span class="bu">min</span>(),sxy.<span class="bu">max</span>()])</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">'ln(evidence)'</span>)</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> np.exp(out<span class="op">-</span>out.<span class="bu">max</span>())<span class="op">/</span>np.nansum(np.exp(out<span class="op">-</span>out.<span class="bu">max</span>()))</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co"># q[np.bitwise_not(np.isfinite(q))] = 0.</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].imshow(q,interpolation<span class="op">=</span><span class="st">'nearest'</span>,cmap<span class="op">=</span><span class="st">'viridis'</span>,origin<span class="op">=</span><span class="st">'lower'</span>,extent<span class="op">=</span>[sxy.<span class="bu">min</span>(),sxy.<span class="bu">max</span>(),sxy.<span class="bu">min</span>(),sxy.<span class="bu">max</span>()])</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(<span class="st">'Probability'</span>)</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> aa <span class="kw">in</span> ax:</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    aa.axhline(y<span class="op">=</span>mu[<span class="dv">0</span>],color<span class="op">=</span><span class="st">'r'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    aa.axvline(x<span class="op">=</span>mu[<span class="dv">1</span>],color<span class="op">=</span><span class="st">'r'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    aa.axhline(mx,color<span class="op">=</span><span class="st">'tab:blue'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    aa.axvline(my,color<span class="op">=</span><span class="st">'tab:blue'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> aa <span class="kw">in</span> ax:</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>    aa.set_xlabel(<span class="st">'Pixels'</span>)</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    aa.set_ylabel(<span class="st">'Pixels'</span>)</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"33211c3a062046ae9605422f1c6f2e41","version_major":2,"version_minor":0}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Truth 0.469 0.373
+Found 0.421 0.421</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-08-Super-Resolution_files/figure-html/cell-5-output-3.png" class="img-fluid"></p>
+</div>
+</div>
+<p>We can see that our method has identified multiple local maxima. As an aside, this grid scanning and local shape calculation is exactly how our method of Bayesian Inference-based Template Search (BITS) works (you can find another example for this <a href="https://bayes-shape-calc.github.io/examples/template-search/2021/12/01/Peak-Search.html">here</a>. Note that we are only picking the central peak in this example.</p>
+</section>
+<section id="zooming-in" class="level1">
+<h1>Zooming in</h1>
+<p>Now let’s zoom into the pixel we found the molecule located in. We will use the same process performed above: sub-divide this region into a grid, create templates (PSF) centered at each grid point, calculate the evidence, and then compare to find the best fit.</p>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ns <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>sx <span class="op">=</span> np.linspace(mx<span class="op">-</span><span class="fl">.5</span>,mx<span class="op">+</span><span class="fl">.5</span>,ns)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>sy <span class="op">=</span> np.linspace(my<span class="op">-</span><span class="fl">.5</span>,my<span class="op">+</span><span class="fl">.5</span>,ns)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>out <span class="op">=</span> np.zeros((ns,ns))</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>ww <span class="op">=</span> <span class="fl">1.5</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Init  </span><span class="sc">%.3f</span><span class="st"> </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(my,mx))</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(sx.size):</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(sy.size):</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        mx <span class="op">=</span> sx[i]</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        my <span class="op">=</span> sy[j]</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        template <span class="op">=</span> np.exp(<span class="op">-</span><span class="fl">.5</span><span class="op">/</span>(ww<span class="op">**</span><span class="fl">2.</span>)<span class="op">*</span>((mx<span class="op">-</span>gx)<span class="op">**</span><span class="fl">2.</span><span class="op">+</span>(my<span class="op">-</span>gy)<span class="op">**</span><span class="fl">2.</span>))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>        out[i,j] <span class="op">=</span> lnevidence(template,z)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>omax <span class="op">=</span> out.<span class="bu">max</span>()</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(sx.size):</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(sy.size):</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> out[i,j] <span class="op">==</span> omax:</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>            mx <span class="op">=</span> sx[i]</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>            my <span class="op">=</span> sy[j]</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Truth </span><span class="sc">%.3f</span><span class="st"> </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(mu[<span class="dv">1</span>],mu[<span class="dv">0</span>]))</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Found </span><span class="sc">%.3f</span><span class="st"> </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(my,mx))</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">6</span>))</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].imshow(out,interpolation<span class="op">=</span><span class="st">'nearest'</span>,cmap<span class="op">=</span><span class="st">'viridis'</span>,origin<span class="op">=</span><span class="st">'lower'</span>,extent<span class="op">=</span>[sy.<span class="bu">min</span>(),sy.<span class="bu">max</span>(),sx.<span class="bu">min</span>(),sx.<span class="bu">max</span>()])</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> np.exp(out<span class="op">-</span>out.<span class="bu">max</span>())<span class="op">/</span>np.nansum(np.exp(out<span class="op">-</span>out.<span class="bu">max</span>()))</span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].imshow(q,interpolation<span class="op">=</span><span class="st">'nearest'</span>,cmap<span class="op">=</span><span class="st">'viridis'</span>,origin<span class="op">=</span><span class="st">'lower'</span>,extent<span class="op">=</span>[sy.<span class="bu">min</span>(),sy.<span class="bu">max</span>(),sx.<span class="bu">min</span>(),sx.<span class="bu">max</span>()])</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> aa <span class="kw">in</span> ax:</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>    aa.axhline(mu[<span class="dv">0</span>],color<span class="op">=</span><span class="st">'r'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    aa.axvline(mu[<span class="dv">1</span>],color<span class="op">=</span><span class="st">'r'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    aa.axhline(mx,color<span class="op">=</span><span class="st">'tab:blue'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    aa.axvline(my,color<span class="op">=</span><span class="st">'tab:blue'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">'ln(evidence)'</span>)</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(<span class="st">'Probability'</span>)</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> aa <span class="kw">in</span> ax:</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>    aa.set_xlabel(<span class="st">'Pixels'</span>)</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>    aa.set_ylabel(<span class="st">'Pixels'</span>)</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Init  0.421 0.421
+Truth 0.469 0.373
+Found 0.492 0.390</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-08-Super-Resolution_files/figure-html/cell-6-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="final-localization" class="level1">
+<h1>Final Localization</h1>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Sub-pixel localization error (</span><span class="sc">%%</span><span class="st">) </span><span class="sc">%.3f</span><span class="st"> </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(<span class="dv">100</span><span class="op">*</span>np.<span class="bu">abs</span>((my<span class="op">-</span>mu[<span class="dv">1</span>])<span class="op">/</span><span class="fl">1.</span>),<span class="dv">100</span><span class="op">*</span>np.<span class="bu">abs</span>((mx<span class="op">-</span>mu[<span class="dv">0</span>])<span class="op">/</span><span class="fl">1.</span>)))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>fig,ax<span class="op">=</span>plt.subplots(<span class="dv">1</span>,figsize<span class="op">=</span>(<span class="dv">6</span>,<span class="dv">6</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Composite'</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>ax.imshow(z,interpolation<span class="op">=</span><span class="st">'nearest'</span>,cmap<span class="op">=</span><span class="st">'Greys_r'</span>,origin<span class="op">=</span><span class="st">'lower'</span>,extent<span class="op">=</span>[xy.<span class="bu">min</span>(),xy.<span class="bu">max</span>(),xy.<span class="bu">min</span>(),xy.<span class="bu">max</span>()])</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>ax.axhline(mu[<span class="dv">0</span>],color<span class="op">=</span><span class="st">'r'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>ax.axvline(mu[<span class="dv">1</span>],color<span class="op">=</span><span class="st">'r'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>ax.axhline(mx,color<span class="op">=</span><span class="st">'tab:blue'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>ax.axvline(my,color<span class="op">=</span><span class="st">'tab:blue'</span>,alpha<span class="op">=</span><span class="fl">.8</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sub-pixel localization error (%) 2.394 1.701</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-12-08-Super-Resolution_files/figure-html/cell-7-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

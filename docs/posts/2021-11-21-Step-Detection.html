@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Korak Ray, Anjali Verma, Ruben Gonzalez and Colin Kinz-Thompson">
+<meta name="dcterms.date" content="2021-11-21">
+<meta name="description" content="This notebook is an example of how to detect multiple steps of unknown size and location using shapes">
+
+<title>Bayesian Shape Calculation Examples - Step Detection</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../images/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../images/favicon.ico" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Bayesian Shape Calculation Examples</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/bayes-shape-calc"><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#intro" id="toc-intro" class="nav-link active" data-scroll-target="#intro">Intro</a></li>
+  <li><a href="#simulate-a-stepping-system-with-drift-and-noise" id="toc-simulate-a-stepping-system-with-drift-and-noise" class="nav-link" data-scroll-target="#simulate-a-stepping-system-with-drift-and-noise">Simulate a Stepping System with Drift and Noise</a></li>
+  <li><a href="#shape-based-evidence-function" id="toc-shape-based-evidence-function" class="nav-link" data-scroll-target="#shape-based-evidence-function">Shape-based Evidence Function</a></li>
+  <li><a href="#bms-calculation-to-find-jump-times" id="toc-bms-calculation-to-find-jump-times" class="nav-link" data-scroll-target="#bms-calculation-to-find-jump-times">BMS Calculation to Find Jump Times</a></li>
+  <li><a href="#super-hard-case-snr-1" id="toc-super-hard-case-snr-1" class="nav-link" data-scroll-target="#super-hard-case-snr-1">Super Hard Case (SNR &lt; 1)</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Step Detection</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">steps</div>
+    <div class="quarto-category">jumps</div>
+  </div>
+  </div>
+
+<div>
+  <div class="description">
+    This notebook is an example of how to detect multiple steps of unknown size and location using shapes
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Korak Ray, Anjali Verma, Ruben Gonzalez and Colin Kinz-Thompson </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 21, 2021</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">March 19, 2023</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<section id="intro" class="level2">
+<h2 class="anchored" data-anchor-id="intro">Intro</h2>
+<p>Detecting steps in noisy data is an important challenge in data analysis. Step detection falls under the scheme of change-point analysis methods, where, in this case, the change point corresponds to a transition in the level of the idealized signal (beyond changes in the signal due to noise and drift).</p>
+<p>Here, we try to detect steps in a time series dataset by modelling the shape of such steps in the data. For example, a dataset containing 2 steps has a different shape than one with 1 or no steps, and as such, this can be used to find the positions of these steps in a time series.</p>
+<p>Here, we generate templates which corresponds to steps at different time points, and compare these shapes to the observed data to find which template matches the shape of the data best. This allows us to identify the time points for the steps based on this matching. The only assumptions made in such an approach is that the steps are in the same direction (either all up or all down) and that the change in intensity associated with each step is identical.</p>
+<div class="cell" data-execution_count="1">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="simulate-a-stepping-system-with-drift-and-noise" class="level1">
+<h1>Simulate a Stepping System with Drift and Noise</h1>
+<p>First, we generate a dataset which corresponds to the simulation of two jumps over 600 data points, each with SNR of ~3. This regime of SNR is very reasonable for single-molecule data, which this dataset is meant to replicate. The dataset also contains a non-zero drift in addition to the noise associated with reading each data point. This dataset is plotted below.</p>
+<div class="cell" data-scrolled="true" data-execution_count="2">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">666</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>nt <span class="op">=</span> <span class="dv">600</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>nj <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>jump_size <span class="op">=</span> <span class="fl">100.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>noise_size <span class="op">=</span> <span class="fl">30.</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>drift_size <span class="op">=</span> <span class="fl">1.</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>tjumps <span class="op">=</span> np.random.randint(low<span class="op">=</span><span class="dv">0</span>,high<span class="op">=</span>nt,size<span class="op">=</span>nj)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>tjumps.sort()</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>zsteps <span class="op">=</span> np.random.normal(size<span class="op">=</span>nj)<span class="op">*</span>noise_size <span class="op">+</span> jump_size</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>noise <span class="op">=</span> np.random.normal(size<span class="op">=</span>nt)<span class="op">*</span>noise_size</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>drift <span class="op">=</span> (np.random.normal(size<span class="op">=</span>nt)<span class="op">*</span>drift_size).cumsum()</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> np.zeros(nt)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nj):</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    z[tjumps[i]:] <span class="op">+=</span> zsteps[i]</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> z <span class="op">+</span> drift <span class="op">+</span> noise</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>snr1 <span class="op">=</span> zsteps[<span class="dv">0</span>]<span class="op">/</span>np.std((noise<span class="op">+</span>drift)[:tjumps[<span class="dv">1</span>]])</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>snr2 <span class="op">=</span> zsteps[<span class="dv">1</span>]<span class="op">/</span>np.std((noise<span class="op">+</span>drift)[tjumps[<span class="dv">0</span>]:])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="3">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">4</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].plot(data,<span class="st">'k'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(data,<span class="st">'o'</span>,color<span class="op">=</span><span class="st">'k'</span>,markersize<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(z<span class="op">+</span>drift,lw<span class="op">=</span><span class="dv">2</span>,color<span class="op">=</span><span class="st">'r'</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> aa <span class="kw">in</span> ax:</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nj):</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        aa.axvline(x<span class="op">=</span>tjumps[i],color<span class="op">=</span><span class="st">'r'</span>,lw<span class="op">=</span><span class="dv">1</span>,zorder<span class="op">=-</span><span class="dv">1</span>,alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">'Data'</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(<span class="st">'Simulated Path'</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="2021-11-21-Step-Detection_files/figure-html/cell-4-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="shape-based-evidence-function" class="level1">
+<h1>Shape-based Evidence Function</h1>
+<p>The evidence function used here corresponds to equation 2.2.1 in the SI of the <a href="https://arxiv.org/abs/2109.12462">Bayesian shape calculation paper</a>. This is a custom loop (just in time compiled in Numba for fast execution) that searches for all non-degenerate pairs of jumps (t1 &lt; t2) longer than 1 datapoint long, by using templates which corresponds to these jumps. According to these templates and evidence, jumps can be both up or both down and still be detected. Having an up and then down jump (or vice versa) requires an additional template to be added to the loop.</p>
+<div class="cell" data-execution_count="4">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numba <span class="im">as</span> nb</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.special <span class="im">import</span> betainc,gammaln</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> lgamma</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="at">@nb.njit</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> shape_calculation(data):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    nt <span class="op">=</span> data.size</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">## Constant evidence statistics</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    N <span class="op">=</span> <span class="bu">float</span>(nt)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    M <span class="op">=</span> (N<span class="op">-</span><span class="fl">2.</span>)<span class="op">/</span><span class="fl">2.</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    ey <span class="op">=</span> np.mean(data)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    eyy <span class="op">=</span> np.mean(data<span class="op">*</span>data)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    vy <span class="op">=</span> eyy <span class="op">-</span> ey<span class="op">*</span>ey <span class="op">+</span> <span class="fl">1e-300</span> <span class="co">## helps with over/underflow</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    lndelpriors <span class="op">=</span> np.log(<span class="fl">1e30</span>) <span class="op">+</span> np.log(<span class="fl">1e30</span>) <span class="op">+</span> np.log(<span class="fl">1e30</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    base_lnev <span class="op">=</span> lgamma(M) <span class="op">-</span>N<span class="op">/</span><span class="fl">2.</span><span class="op">*</span>np.log(N) <span class="op">-</span> M<span class="op">*</span>(np.log(np.pi) <span class="op">+</span> np.log(vy)) <span class="op">-</span> lndelpriors</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="co">## Initialize</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    lnevs <span class="op">=</span> np.zeros((nt,nt)) <span class="op">+</span> np.nan</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    template <span class="op">=</span> np.zeros_like(data)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nt): <span class="co">## sweep jump 1</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(i<span class="op">+</span><span class="dv">2</span>,nt): <span class="co">## sweep jump 2</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>            <span class="co">## make the template</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>            template <span class="op">*=</span> <span class="dv">0</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>            template[i:] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>            template[j:] <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>            <span class="co">## Template-dependent evidence statistics</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>            ex <span class="op">=</span> np.mean(template)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>            exx <span class="op">=</span> np.mean(template<span class="op">*</span>template)</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>            exy <span class="op">=</span> np.mean(template<span class="op">*</span>data)      </span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>            vx <span class="op">=</span> exx <span class="op">-</span> ex<span class="op">*</span>ex <span class="op">+</span> <span class="fl">1e-300</span> <span class="co">## helps with over/underflow</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>            vxy <span class="op">=</span> exy <span class="op">-</span> ex<span class="op">*</span>ey <span class="op">+</span> <span class="fl">1e-300</span> <span class="co">## helps with over/underflow</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>            r2<span class="op">=</span> vxy<span class="op">**</span><span class="fl">2.</span><span class="op">/</span>(vx<span class="op">*</span>vy)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>            <span class="co">## Evidence - 2.2.1 - m in R, b in R, tau &gt; 0</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>            <span class="co">## allows for steps up and steps down</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>            lnevs[i,j]  <span class="op">=</span> base_lnev <span class="op">-</span><span class="fl">.5</span><span class="op">*</span>np.log(vx)</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>            lnevs[i,j] <span class="op">-=</span> M<span class="op">*</span>np.log(<span class="fl">1.</span><span class="op">-</span>r2)</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> lnevs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="bms-calculation-to-find-jump-times" class="level1">
+<h1>BMS Calculation to Find Jump Times</h1>
+<p>Here, we calculate the evidences of each template (pair of jumps), and then calculate the probability of them using Bayesian model selection (BMS).</p>
+<div class="cell" data-execution_count="5">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ln_evs <span class="op">=</span> shape_calculation(data)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>_l <span class="op">=</span> ln_evs[np.isfinite(ln_evs)]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>_l <span class="op">-=</span> np.<span class="bu">max</span>(_l)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>ln_prior <span class="op">=</span> <span class="op">-</span>np.log(_l.size) <span class="co">## equal 1/N priors</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>joint <span class="op">=</span> np.exp(_l<span class="op">+</span>ln_prior)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>bms_probs <span class="op">=</span> np.zeros_like(ln_evs)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>bms_probs[np.isfinite(ln_evs)] <span class="op">=</span> joint<span class="op">/</span>joint.<span class="bu">sum</span>()</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Jumps are found at</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>location <span class="op">=</span> np.nonzero(bms_probs <span class="op">==</span> bms_probs.<span class="bu">max</span>())</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>t1 <span class="op">=</span> location[<span class="dv">0</span>][<span class="dv">0</span>]</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>t2 <span class="op">=</span> location[<span class="dv">1</span>][<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="6">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">6</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> aa <span class="kw">in</span> ax:</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    aa.imshow(ln_evs.T,origin <span class="op">=</span><span class="st">'lower'</span>,interpolation<span class="op">=</span><span class="st">'nearest'</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    aa.set_xlabel(<span class="st">'Time of jump 1'</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    aa.set_ylabel(<span class="st">'Time of jump 2'</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    aa.set_title(<span class="st">'ln(Evidence)'</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    aa.axvline(tjumps[<span class="dv">0</span>],color<span class="op">=</span><span class="st">'r'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    aa.axhline(tjumps[<span class="dv">1</span>],color<span class="op">=</span><span class="st">'r'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    aa.axvline(t1,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    aa.axhline(t2,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_xlim(tjumps[<span class="dv">0</span>]<span class="op">-</span><span class="dv">10</span>,tjumps[<span class="dv">0</span>]<span class="op">+</span><span class="dv">11</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylim(tjumps[<span class="dv">1</span>]<span class="op">-</span><span class="dv">10</span>,tjumps[<span class="dv">1</span>]<span class="op">+</span><span class="dv">11</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="2021-11-21-Step-Detection_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell" data-execution_count="7">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">6</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> aa <span class="kw">in</span> ax:</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    aa.imshow(bms_probs.T,origin <span class="op">=</span><span class="st">'lower'</span>,interpolation<span class="op">=</span><span class="st">'nearest'</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    aa.set_xlabel(<span class="st">'Time of jump 1'</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    aa.set_ylabel(<span class="st">'Time of jump 2'</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    aa.set_title(<span class="st">'Prob of jump times'</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    aa.axvline(tjumps[<span class="dv">0</span>],color<span class="op">=</span><span class="st">'r'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    aa.axhline(tjumps[<span class="dv">1</span>],color<span class="op">=</span><span class="st">'r'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    aa.axvline(t1,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    aa.axhline(t2,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_xlim(tjumps[<span class="dv">0</span>]<span class="op">-</span><span class="dv">10</span>,tjumps[<span class="dv">0</span>]<span class="op">+</span><span class="dv">11</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylim(tjumps[<span class="dv">1</span>]<span class="op">-</span><span class="dv">10</span>,tjumps[<span class="dv">1</span>]<span class="op">+</span><span class="dv">11</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="2021-11-21-Step-Detection_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>It’s an exact match! Let’s see where we’ve predicted the jumps as overlaid over the real data.</p>
+<div class="cell" data-execution_count="8">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can idealize the trace a rolling average of each region</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy <span class="im">import</span> ndimage <span class="im">as</span> nd</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>idealized <span class="op">=</span> np.zeros_like(data)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>width <span class="op">=</span> <span class="dv">20</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>idealized[:t1] <span class="op">=</span> nd.gaussian_filter(data[:t1],width)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>idealized[t1:t2] <span class="op">=</span> nd.gaussian_filter(data[t1:t2],width)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>idealized[t2:] <span class="op">=</span> nd.gaussian_filter(data[t2:],width)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">1</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">4</span>))</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>ax.plot(data,<span class="st">'ok'</span>,markersize<span class="op">=</span><span class="fl">.5</span>,lw<span class="op">=</span><span class="fl">.5</span>,label<span class="op">=</span><span class="st">'Data'</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>ax.plot(z<span class="op">+</span>drift,lw<span class="op">=</span><span class="dv">1</span>,label<span class="op">=</span><span class="st">'True path'</span>,color<span class="op">=</span><span class="st">'red'</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>ax.plot(idealized,lw<span class="op">=</span><span class="dv">2</span>,label<span class="op">=</span><span class="st">'Idealized'</span>,color<span class="op">=</span><span class="st">'tab:blue'</span>)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>ax.legend(loc<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span>tjumps[<span class="dv">0</span>],color<span class="op">=</span><span class="st">'red'</span>,lw<span class="op">=</span><span class="dv">1</span>,zorder<span class="op">=-</span><span class="dv">1</span>,alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span>tjumps[<span class="dv">1</span>],color<span class="op">=</span><span class="st">'red'</span>,lw<span class="op">=</span><span class="dv">1</span>,zorder<span class="op">=-</span><span class="dv">1</span>,alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span>t1,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="dv">1</span>,zorder<span class="op">=-</span><span class="dv">1</span>,alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span>t2,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="dv">1</span>,zorder<span class="op">=-</span><span class="dv">1</span>,alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Data'</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="2021-11-21-Step-Detection_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Thus, our method seems to work very well for low SNR jumps!</p>
+<div class="cell" data-execution_count="9">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Found jump 1 (t=</span><span class="sc">%d</span><span class="st">) at </span><span class="sc">%d</span><span class="st">'</span><span class="op">%</span>(tjumps[<span class="dv">0</span>],t1))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Found jump 2 (t=</span><span class="sc">%d</span><span class="st">) at </span><span class="sc">%d</span><span class="st">'</span><span class="op">%</span>(tjumps[<span class="dv">1</span>],t2))</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'SNR for jump 1 = </span><span class="sc">%f</span><span class="st">'</span><span class="op">%</span>(snr1))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'SNR for jump 2 = </span><span class="sc">%f</span><span class="st">'</span><span class="op">%</span>(snr2))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Probability of this model: </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(np.sort(bms_probs.flatten())[<span class="op">-</span><span class="dv">1</span>:][<span class="dv">0</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Found jump 1 (t=236) at 236
+Found jump 2 (t=429) at 429
+SNR for jump 1 = 2.918031
+SNR for jump 2 = 3.036615
+Probability of this model: 0.681</code></pre>
+</div>
+</div>
+</section>
+<section id="super-hard-case-snr-1" class="level1">
+<h1>Super Hard Case (SNR &lt; 1)</h1>
+<p>In the next example, we drop the SNR to less than 1, where it is barely visible ‘by eye’. Note: we remove the drift noise because it’s difficult to ensure the transitions have similar SNR otherwise.</p>
+<div class="cell" data-execution_count="10">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">661</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>nt <span class="op">=</span> <span class="dv">600</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>nj <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>jump_size <span class="op">=</span> <span class="fl">400.</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>noise_size <span class="op">=</span> <span class="fl">500.</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>drift_size <span class="op">=</span> <span class="fl">0.</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>tjumps <span class="op">=</span> np.random.randint(low<span class="op">=</span><span class="dv">0</span>,high<span class="op">=</span>nt,size<span class="op">=</span>nj)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>tjumps.sort()</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>np.random.rand(<span class="dv">666</span>) <span class="co">## keep randomized jumps but switch noise up</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>zsteps <span class="op">=</span> np.random.normal(size<span class="op">=</span>nj)<span class="op">*</span>noise_size<span class="op">/</span><span class="dv">4</span> <span class="op">+</span> jump_size</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>noise <span class="op">=</span> np.random.normal(size<span class="op">=</span>nt)<span class="op">*</span>noise_size</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>drift <span class="op">=</span> (np.random.normal(size<span class="op">=</span>nt)<span class="op">*</span>drift_size).cumsum()</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> np.zeros(nt)</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nj):</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    z[tjumps[i]:] <span class="op">+=</span> zsteps[i]</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> z <span class="op">+</span> drift <span class="op">+</span> noise</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>snr1 <span class="op">=</span> (zsteps[<span class="dv">0</span>])<span class="op">/</span>np.std((noise<span class="op">+</span>drift)[:tjumps[<span class="dv">1</span>]])</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>snr2 <span class="op">=</span> (zsteps[<span class="dv">1</span>])<span class="op">/</span>np.std((noise<span class="op">+</span>drift)[tjumps[<span class="dv">0</span>]:])</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">4</span>))</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].plot(data,<span class="st">'k'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(data,<span class="st">'o'</span>,color<span class="op">=</span><span class="st">'k'</span>,markersize<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].plot(z<span class="op">+</span>drift,lw<span class="op">=</span><span class="dv">3</span>,color<span class="op">=</span><span class="st">'r'</span>)</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> aa <span class="kw">in</span> ax:</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(nj):</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>        aa.axvline(x<span class="op">=</span>tjumps[i],color<span class="op">=</span><span class="st">'r'</span>,lw<span class="op">=</span><span class="dv">1</span>,zorder<span class="op">=-</span><span class="dv">1</span>,alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">0</span>].set_title(<span class="st">'Data'</span>)</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_title(<span class="st">'Simulated Path'</span>)</span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>ln_evs <span class="op">=</span> shape_calculation(data)</span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a>_l <span class="op">=</span> ln_evs[np.isfinite(ln_evs)]</span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a>_l <span class="op">-=</span> np.<span class="bu">max</span>(_l)</span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a>ln_prior <span class="op">=</span> <span class="op">-</span>np.log(_l.size) <span class="co">## equal 1/N priors</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a>joint <span class="op">=</span> np.exp(_l<span class="op">+</span>ln_prior)</span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a>bms_probs <span class="op">=</span> np.zeros_like(ln_evs)</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a>bms_probs[np.isfinite(ln_evs)] <span class="op">=</span> joint<span class="op">/</span>joint.<span class="bu">sum</span>()</span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Jumps are found at</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>location <span class="op">=</span> np.nonzero(bms_probs <span class="op">==</span> bms_probs.<span class="bu">max</span>())</span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a>t1 <span class="op">=</span> location[<span class="dv">0</span>][<span class="dv">0</span>]</span>
+<span id="cb11-51"><a href="#cb11-51" aria-hidden="true" tabindex="-1"></a>t2 <span class="op">=</span> location[<span class="dv">1</span>][<span class="dv">0</span>]</span>
+<span id="cb11-52"><a href="#cb11-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-53"><a href="#cb11-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-54"><a href="#cb11-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-55"><a href="#cb11-55" aria-hidden="true" tabindex="-1"></a><span class="co"># Plots</span></span>
+<span id="cb11-56"><a href="#cb11-56" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">6</span>))</span>
+<span id="cb11-57"><a href="#cb11-57" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> aa <span class="kw">in</span> ax:</span>
+<span id="cb11-58"><a href="#cb11-58" aria-hidden="true" tabindex="-1"></a>    aa.imshow(ln_evs.T,origin <span class="op">=</span><span class="st">'lower'</span>,interpolation<span class="op">=</span><span class="st">'nearest'</span>)</span>
+<span id="cb11-59"><a href="#cb11-59" aria-hidden="true" tabindex="-1"></a>    aa.set_xlabel(<span class="st">'Time of jump 1'</span>)</span>
+<span id="cb11-60"><a href="#cb11-60" aria-hidden="true" tabindex="-1"></a>    aa.set_ylabel(<span class="st">'Time of jump 2'</span>)</span>
+<span id="cb11-61"><a href="#cb11-61" aria-hidden="true" tabindex="-1"></a>    aa.set_title(<span class="st">'ln(Evidence)'</span>)</span>
+<span id="cb11-62"><a href="#cb11-62" aria-hidden="true" tabindex="-1"></a>    aa.axvline(tjumps[<span class="dv">0</span>],color<span class="op">=</span><span class="st">'r'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-63"><a href="#cb11-63" aria-hidden="true" tabindex="-1"></a>    aa.axhline(tjumps[<span class="dv">1</span>],color<span class="op">=</span><span class="st">'r'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-64"><a href="#cb11-64" aria-hidden="true" tabindex="-1"></a>    aa.axvline(t1,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-65"><a href="#cb11-65" aria-hidden="true" tabindex="-1"></a>    aa.axhline(t2,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-66"><a href="#cb11-66" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_xlim(tjumps[<span class="dv">0</span>]<span class="op">-</span><span class="dv">10</span>,tjumps[<span class="dv">0</span>]<span class="op">+</span><span class="dv">11</span>)</span>
+<span id="cb11-67"><a href="#cb11-67" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylim(tjumps[<span class="dv">1</span>]<span class="op">-</span><span class="dv">10</span>,tjumps[<span class="dv">1</span>]<span class="op">+</span><span class="dv">11</span>)</span>
+<span id="cb11-68"><a href="#cb11-68" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb11-69"><a href="#cb11-69" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">2</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">6</span>))</span>
+<span id="cb11-70"><a href="#cb11-70" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> aa <span class="kw">in</span> ax:</span>
+<span id="cb11-71"><a href="#cb11-71" aria-hidden="true" tabindex="-1"></a>    aa.imshow(bms_probs.T,origin <span class="op">=</span><span class="st">'lower'</span>,interpolation<span class="op">=</span><span class="st">'nearest'</span>)</span>
+<span id="cb11-72"><a href="#cb11-72" aria-hidden="true" tabindex="-1"></a>    aa.set_xlabel(<span class="st">'Time of jump 1'</span>)</span>
+<span id="cb11-73"><a href="#cb11-73" aria-hidden="true" tabindex="-1"></a>    aa.set_ylabel(<span class="st">'Time of jump 2'</span>)</span>
+<span id="cb11-74"><a href="#cb11-74" aria-hidden="true" tabindex="-1"></a>    aa.set_title(<span class="st">'Prob of jump times'</span>)</span>
+<span id="cb11-75"><a href="#cb11-75" aria-hidden="true" tabindex="-1"></a>    aa.axvline(tjumps[<span class="dv">0</span>],color<span class="op">=</span><span class="st">'r'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-76"><a href="#cb11-76" aria-hidden="true" tabindex="-1"></a>    aa.axhline(tjumps[<span class="dv">1</span>],color<span class="op">=</span><span class="st">'r'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-77"><a href="#cb11-77" aria-hidden="true" tabindex="-1"></a>    aa.axvline(t1,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-78"><a href="#cb11-78" aria-hidden="true" tabindex="-1"></a>    aa.axhline(t2,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-79"><a href="#cb11-79" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_xlim(tjumps[<span class="dv">0</span>]<span class="op">-</span><span class="dv">10</span>,tjumps[<span class="dv">0</span>]<span class="op">+</span><span class="dv">11</span>)</span>
+<span id="cb11-80"><a href="#cb11-80" aria-hidden="true" tabindex="-1"></a>ax[<span class="dv">1</span>].set_ylim(tjumps[<span class="dv">1</span>]<span class="op">-</span><span class="dv">10</span>,tjumps[<span class="dv">1</span>]<span class="op">+</span><span class="dv">11</span>)</span>
+<span id="cb11-81"><a href="#cb11-81" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb11-82"><a href="#cb11-82" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb11-83"><a href="#cb11-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-84"><a href="#cb11-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-85"><a href="#cb11-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-86"><a href="#cb11-86" aria-hidden="true" tabindex="-1"></a><span class="co"># We can idealize the trace as the mean of each region</span></span>
+<span id="cb11-87"><a href="#cb11-87" aria-hidden="true" tabindex="-1"></a>idealized <span class="op">=</span> np.zeros_like(data)</span>
+<span id="cb11-88"><a href="#cb11-88" aria-hidden="true" tabindex="-1"></a>idealized[:t1] <span class="op">=</span> np.mean(data[:t1])</span>
+<span id="cb11-89"><a href="#cb11-89" aria-hidden="true" tabindex="-1"></a>idealized[t1:t2] <span class="op">=</span> np.mean(data[t1:t2])</span>
+<span id="cb11-90"><a href="#cb11-90" aria-hidden="true" tabindex="-1"></a>idealized[t2:] <span class="op">=</span> np.mean(data[t2:])</span>
+<span id="cb11-91"><a href="#cb11-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-92"><a href="#cb11-92" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>,<span class="dv">1</span>,figsize<span class="op">=</span>(<span class="dv">12</span>,<span class="dv">4</span>))</span>
+<span id="cb11-93"><a href="#cb11-93" aria-hidden="true" tabindex="-1"></a>ax.plot(data,<span class="st">'ok'</span>,markersize<span class="op">=</span><span class="fl">.5</span>,lw<span class="op">=</span><span class="fl">.5</span>,label<span class="op">=</span><span class="st">'Data'</span>)</span>
+<span id="cb11-94"><a href="#cb11-94" aria-hidden="true" tabindex="-1"></a>ax.plot(z<span class="op">+</span>drift,lw<span class="op">=</span><span class="dv">1</span>,label<span class="op">=</span><span class="st">'True path'</span>,color<span class="op">=</span><span class="st">'red'</span>)</span>
+<span id="cb11-95"><a href="#cb11-95" aria-hidden="true" tabindex="-1"></a>ax.plot(idealized,lw<span class="op">=</span><span class="dv">2</span>,label<span class="op">=</span><span class="st">'Idealized'</span>,color<span class="op">=</span><span class="st">'tab:blue'</span>)</span>
+<span id="cb11-96"><a href="#cb11-96" aria-hidden="true" tabindex="-1"></a>ax.legend(loc<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb11-97"><a href="#cb11-97" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span>tjumps[<span class="dv">0</span>],color<span class="op">=</span><span class="st">'red'</span>,lw<span class="op">=</span><span class="dv">1</span>,zorder<span class="op">=-</span><span class="dv">1</span>,alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-98"><a href="#cb11-98" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span>tjumps[<span class="dv">1</span>],color<span class="op">=</span><span class="st">'red'</span>,lw<span class="op">=</span><span class="dv">1</span>,zorder<span class="op">=-</span><span class="dv">1</span>,alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-99"><a href="#cb11-99" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span>t1,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="dv">1</span>,zorder<span class="op">=-</span><span class="dv">1</span>,alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-100"><a href="#cb11-100" aria-hidden="true" tabindex="-1"></a>ax.axvline(x<span class="op">=</span>t2,color<span class="op">=</span><span class="st">'tab:blue'</span>,lw<span class="op">=</span><span class="dv">1</span>,zorder<span class="op">=-</span><span class="dv">1</span>,alpha<span class="op">=</span><span class="fl">.5</span>)</span>
+<span id="cb11-101"><a href="#cb11-101" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">'Data'</span>)</span>
+<span id="cb11-102"><a href="#cb11-102" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb11-103"><a href="#cb11-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-104"><a href="#cb11-104" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Found jump 1 (t=</span><span class="sc">%d</span><span class="st">) at </span><span class="sc">%d</span><span class="st">'</span><span class="op">%</span>(tjumps[<span class="dv">0</span>],t1))</span>
+<span id="cb11-105"><a href="#cb11-105" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Found jump 2 (t=</span><span class="sc">%d</span><span class="st">) at </span><span class="sc">%d</span><span class="st">'</span><span class="op">%</span>(tjumps[<span class="dv">1</span>],t2))</span>
+<span id="cb11-106"><a href="#cb11-106" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'SNR for jump 1 = </span><span class="sc">%f</span><span class="st">'</span><span class="op">%</span>(snr1))</span>
+<span id="cb11-107"><a href="#cb11-107" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'SNR for jump 2 = </span><span class="sc">%f</span><span class="st">'</span><span class="op">%</span>(snr2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="2021-11-21-Step-Detection_files/figure-html/cell-11-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-11-21-Step-Detection_files/figure-html/cell-11-output-2.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-11-21-Step-Detection_files/figure-html/cell-11-output-3.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="2021-11-21-Step-Detection_files/figure-html/cell-11-output-4.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Found jump 1 (t=79) at 76
+Found jump 2 (t=476) at 481
+SNR for jump 1 = 0.569801
+SNR for jump 2 = 0.894949</code></pre>
+</div>
+</div>
+<p>This is still pretty close!! But note that this model is not very likely! The probability for this model is given below.</p>
+<div class="cell" data-execution_count="11">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Probability of this model: </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(np.sort(bms_probs.flatten())[<span class="op">-</span><span class="dv">1</span>:][<span class="dv">0</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Probability of this model: 0.015</code></pre>
+</div>
+</div>
+<p>This is partially an indication that it is very difficult to localize both jumps in this super noisy dataset. It is worth noting that it is much easier to find either of the jumps separately. We see this by marginalizing out the other jump and finding the maximum probability jump.</p>
+<div class="cell" data-execution_count="12">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Highest probability localization of just jump 1: </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(np.sort(bms_probs.<span class="bu">sum</span>(<span class="dv">1</span>))[<span class="op">-</span><span class="dv">1</span>:][<span class="dv">0</span>]))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Highest probability localization of just jump 2: </span><span class="sc">%.3f</span><span class="st">'</span><span class="op">%</span>(np.sort(bms_probs.<span class="bu">sum</span>(<span class="dv">0</span>))[<span class="op">-</span><span class="dv">1</span>:][<span class="dv">0</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Highest probability localization of just jump 1: 0.114
+Highest probability localization of just jump 2: 0.130</code></pre>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
